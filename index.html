@@ -1,0 +1,2349 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>XWORM - XX</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+:root {
+  --bg:#0e1117; --card:#151c2c; --card2:#1a2235;
+  --blue:#1a6bdb; --blue2:#2a7ef5; --blue-light:#4a9eff; --cyan:#00eeff;
+  --orange:#f5a623; --red:#e84040; --green:#2ecc71;
+  --text:#d0dff5; --muted:#5a6a8a; --border:#1e2d4a; --border2:#1a3a5c;
+  --purple:#7c3aed; --purple2:#9d4edd; --purple-light:#c084fc;
+}
+
+/* ── LOGIN PAGE ── */
+#loginPage {
+  position:fixed; inset:0; background:linear-gradient(180deg,#0d0018 0%,#130020 40%,#0a000f 100%);
+  z-index:9000; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:40px 24px; max-width:420px; margin:0 auto;
+}
+#loginPage.hide { display:none; }
+
+.login-glow {
+  position:absolute; top:20%; left:50%; transform:translateX(-50%);
+  width:260px; height:260px; border-radius:50%;
+  background:radial-gradient(circle,rgba(124,58,237,0.25) 0%,transparent 70%);
+  pointer-events:none;
+}
+
+.login-logo {
+  width:110px; height:110px; border-radius:24px; object-fit:cover;
+  box-shadow:0 0 40px rgba(124,58,237,0.6), 0 0 80px rgba(124,58,237,0.2);
+  margin-bottom:28px; position:relative; z-index:1;
+}
+
+.login-tagline {
+  font-family:'Share Tech Mono',monospace; font-size:20px; color:var(--purple-light);
+  text-align:center; line-height:1.5; margin-bottom:6px; letter-spacing:1px;
+}
+.login-tagline em { color:#fff; font-style:italic; font-family:'Orbitron',monospace; }
+.login-subtitle {
+  font-family:'Share Tech Mono',monospace; font-size:12px; color:rgba(255,255,255,0.35);
+  text-align:center; letter-spacing:2px; margin-bottom:36px;
+}
+
+.login-card {
+  width:100%; background:rgba(255,255,255,0.04);
+  border:1px solid rgba(124,58,237,0.3); border-radius:20px; padding:24px 20px;
+  backdrop-filter:blur(10px);
+}
+
+.login-field {
+  display:flex; align-items:center; gap:14px;
+  background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px; padding:14px 16px; margin-bottom:14px;
+  transition:border-color 0.3s;
+}
+.login-field:focus-within { border-color:var(--purple2); box-shadow:0 0 0 2px rgba(157,78,221,0.2); }
+.login-field svg { color:rgba(255,255,255,0.3); flex-shrink:0; }
+.login-field input {
+  flex:1; background:none; border:none; outline:none;
+  font-family:'Share Tech Mono',monospace; font-size:14px; color:#fff;
+  letter-spacing:0.5px;
+}
+.login-field input::placeholder { color:rgba(255,255,255,0.25); }
+.login-eye { cursor:pointer; color:rgba(255,255,255,0.3); display:flex; align-items:center; }
+
+.login-btn {
+  width:100%; padding:16px; border:none; border-radius:12px; margin-top:6px;
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+  font-family:'Share Tech Mono',monospace; font-size:16px; color:#fff;
+  letter-spacing:2px; cursor:pointer;
+  box-shadow:0 4px 24px rgba(124,58,237,0.5);
+  transition:transform 0.15s, opacity 0.2s;
+}
+.login-btn:active { transform:scale(0.97); opacity:0.9; }
+
+.login-err {
+  font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--red);
+  text-align:center; margin-top:10px; display:none; letter-spacing:0.5px;
+}
+
+/* ── INTRO VIDEO ── */
+#introVideo {
+  position:fixed; inset:0; background:#000; z-index:8000;
+  display:none; flex-direction:column; align-items:center; justify-content:center;
+  max-width:420px; margin:0 auto;
+}
+#introVideo.show { display:flex; }
+#introVideo iframe { width:100%; height:100%; border:none; position:absolute; inset:0; }
+.skip-btn {
+  position:absolute; bottom:40px; right:20px; z-index:10;
+  background:rgba(0,0,0,0.7); border:1px solid rgba(255,255,255,0.3);
+  border-radius:20px; padding:10px 20px; color:#fff; cursor:pointer;
+  font-family:'Share Tech Mono',monospace; font-size:12px; display:flex; align-items:center; gap:8px;
+  backdrop-filter:blur(6px);
+}
+body { background:var(--bg); color:var(--text); font-family:'Rajdhani',sans-serif; max-width:420px; margin:0 auto; min-height:100vh; overflow-x:hidden; }
+
+/* ── TOPBAR ── */
+.topbar { display:flex; align-items:center; justify-content:space-between; padding:14px 16px 12px; background:rgba(14,17,23,0.97); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:200; backdrop-filter:blur(10px); }
+.topbar-left { display:flex; align-items:center; gap:12px; }
+.topbar-title { font-family:'Share Tech Mono',monospace; font-size:15px; color:#fff; letter-spacing:1.5px; }
+.topbar-right { display:flex; align-items:center; gap:14px; color:var(--text); }
+.icon-btn { cursor:pointer; display:flex; align-items:center; justify-content:center; position:relative; }
+.bell-dot::after { content:''; position:absolute; top:-1px; right:-1px; width:7px; height:7px; background:var(--blue2); border-radius:50%; border:1.5px solid var(--bg); }
+.profile-circle { width:28px; height:28px; background:var(--card2); border-radius:50%; border:1.5px solid var(--blue); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+
+/* ── SIDEBAR DRAWER ── */
+.drawer-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:70px; background:rgba(0,0,0,0.6); z-index:300; backdrop-filter:blur(3px); }
+.drawer-overlay.open { display:block; animation:fadeOv 0.25s ease; }
+@keyframes fadeOv { from{opacity:0} to{opacity:1} }
+
+.drawer {
+  position:fixed; top:0; left:-100%; width:75%; max-width:300px; height:calc(100% - 70px);
+  background:var(--card); z-index:301;
+  transition:left 0.32s cubic-bezier(0.32,0.72,0,1);
+  display:flex; flex-direction:column; overflow:hidden;
+}
+.drawer.open { left:0; }
+
+.drawer-header {
+  position:relative; height:160px; overflow:hidden; flex-shrink:0;
+}
+.drawer-header-img {
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  filter:brightness(0.35) saturate(1.2);
+}
+.drawer-header-overlay {
+  position:absolute; inset:0;
+  background:linear-gradient(to bottom, transparent 30%, var(--card) 100%);
+}
+.drawer-header-content {
+  position:absolute; bottom:0; left:0; right:0; padding:16px 18px;
+}
+.drawer-app-name { font-family:'Orbitron',monospace; font-size:18px; font-weight:900; color:#fff; letter-spacing:1px; }
+.drawer-user-info { font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--cyan); margin-top:4px; letter-spacing:0.5px; }
+
+.drawer-menu { flex:1; padding:8px 0; overflow-y:auto; }
+.drawer-item {
+  display:flex; align-items:center; gap:16px; padding:16px 20px;
+  font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:600; color:var(--text);
+  cursor:pointer; transition:background 0.15s;
+  border-bottom:1px solid rgba(30,45,74,0.3);
+}
+.drawer-item:hover { background:rgba(42,126,245,0.08); }
+.drawer-item svg { color:var(--blue2); flex-shrink:0; }
+
+.drawer-divider { height:1px; background:var(--border); margin:8px 0; }
+
+.drawer-credits { padding:16px 20px; }
+.drawer-credits-title {
+  display:flex; align-items:center; gap:8px;
+  font-family:'Orbitron',monospace; font-size:13px; font-weight:700; color:#fff;
+  margin-bottom:12px;
+  border-left:3px solid var(--blue2); padding-left:10px;
+}
+.drawer-credit-line { font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--muted); margin-bottom:6px; }
+.drawer-credit-line span { color:var(--blue2); }
+
+/* ── PAGES ── */
+.page { display:none; padding-bottom:90px; }
+.page.active { display:block; animation:fadeIn 0.22s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── HOME ── */
+.welcome-card { margin:14px 14px 0; background:linear-gradient(135deg,#1855b8,#1a6bdb 50%,#2a7ef5); border-radius:16px; padding:18px 18px 16px; box-shadow:0 6px 30px rgba(26,107,219,0.4); position:relative; overflow:hidden; }
+.welcome-card::before { content:''; position:absolute; top:-40px; right:-40px; width:160px; height:160px; background:rgba(255,255,255,0.06); border-radius:50%; }
+.welcome-card::after { content:''; position:absolute; bottom:-30px; left:30%; width:120px; height:120px; background:rgba(255,255,255,0.04); border-radius:50%; }
+.wc-top { display:flex; align-items:center; gap:12px; margin-bottom:16px; position:relative; z-index:1; }
+.wc-app-icon { width:44px; height:44px; background:rgba(255,255,255,0.18); border-radius:10px; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
+.wc-label { font-family:'Share Tech Mono',monospace; font-size:11px; color:rgba(255,255,255,0.7); letter-spacing:1px; margin-bottom:3px; }
+.wc-title { font-family:'Orbitron',monospace; font-size:15px; font-weight:700; color:#fff; }
+.wc-stats { display:grid; grid-template-columns:1fr 1fr; gap:10px; position:relative; z-index:1; }
+.stat-box { background:rgba(255,255,255,0.12); border-radius:10px; padding:10px 14px; backdrop-filter:blur(4px); }
+.stat-label { display:flex; align-items:center; gap:6px; font-family:'Share Tech Mono',monospace; font-size:10px; color:rgba(255,255,255,0.65); margin-bottom:4px; }
+.stat-val { font-family:'Orbitron',monospace; font-size:22px; font-weight:700; color:#fff; }
+.sec-title { font-family:'Rajdhani',sans-serif; font-size:18px; font-weight:700; color:#fff; margin:20px 14px 12px; }
+.slider-wrap { position:relative; margin:0 14px; border-radius:14px; overflow:hidden; height:210px; box-shadow:0 4px 24px rgba(0,0,0,0.5); }
+.slider-track { display:flex; height:100%; transition:transform 0.45s cubic-bezier(0.4,0,0.2,1); will-change:transform; }
+.slide { flex-shrink:0; width:100%; height:100%; position:relative; }
+.slide img { width:100%; height:100%; object-fit:cover; display:block; }
+.slide-overlay { position:absolute; inset:0; background:linear-gradient(to top,rgba(0,0,0,0.75),transparent 55%); }
+.slide-info { position:absolute; bottom:14px; left:16px; }
+.slide-title { font-family:'Share Tech Mono',monospace; font-size:14px; color:#fff; margin-bottom:4px; }
+.slide-sub { font-family:'Share Tech Mono',monospace; font-size:10px; color:rgba(255,255,255,0.65); }
+.slider-dots { position:absolute; bottom:12px; right:14px; display:flex; gap:5px; }
+.dot { width:6px; height:6px; border-radius:3px; background:rgba(255,255,255,0.35); transition:all 0.3s; cursor:pointer; }
+.dot.active { width:18px; background:#fff; }
+.slider-btn { position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.45); border:none; color:#fff; width:32px; height:32px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:10; }
+.slider-btn.prev{left:10px} .slider-btn.next{right:10px}
+.stats-grid { margin:0 14px; display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.acc-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px 14px; display:flex; align-items:center; gap:14px; cursor:pointer; transition:border-color 0.2s,box-shadow 0.2s; }
+.acc-card:hover { border-color:var(--blue); box-shadow:0 0 14px rgba(26,107,219,0.2); }
+.acc-card.full { grid-column:1/-1; }
+.acc-icon { width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.acc-icon.blue{background:rgba(26,107,219,0.18)} .acc-icon.red{background:rgba(232,64,64,0.18)} .acc-icon.orange{background:rgba(245,166,35,0.18)}
+.acc-label { font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--muted); margin-bottom:5px; }
+.acc-val { font-family:'Orbitron',monospace; font-size:14px; font-weight:700; }
+.acc-val.blue{color:var(--blue-light)} .acc-val.red{color:var(--red)} .acc-val.orange{color:var(--orange)}
+
+/* ── WHATSAPP PAGE ── */
+.profile-hero { margin:14px 14px 0; border-radius:16px; overflow:hidden; position:relative; height:200px; border:1px solid var(--border2); box-shadow:0 0 30px rgba(0,100,255,0.2); }
+.hero-fallback { position:absolute; inset:0; background:linear-gradient(135deg,#05001a,#0a0535 20%,#120060 40%,#1a0080 55%,#0d1a6b 70%,#040010); z-index:0; }
+.yt-bg { position:absolute; inset:-30px -60px; width:calc(100% + 120px); height:calc(100% + 60px); pointer-events:none; filter:blur(3px) brightness(0.35) saturate(1.4); overflow:hidden; z-index:1; }
+.yt-bg iframe { width:100%; height:100%; border:none; }
+.hero-grid { position:absolute; inset:0; z-index:2; background-image:linear-gradient(rgba(0,170,255,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,170,255,0.06) 1px,transparent 1px); background-size:28px 28px; }
+.hero-glow { position:absolute; inset:0; z-index:2; background:radial-gradient(ellipse 60% 80% at 50% 110%,rgba(0,140,255,0.4),transparent 60%),radial-gradient(ellipse 100% 40% at 50% -10%,rgba(0,80,200,0.3),transparent 70%); }
+.hero-overlay { position:absolute; inset:0; z-index:3; background:linear-gradient(to bottom,rgba(14,17,23,0.5),transparent 30%,transparent 60%,rgba(14,17,23,0.7)); }
+.hero-content { position:absolute; inset:0; z-index:4; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; }
+.profile-pill { background:rgba(0,0,0,0.5); border:1px solid rgba(0,170,255,0.5); border-radius:20px; padding:4px 18px; font-family:'Orbitron',monospace; font-size:11px; color:var(--cyan); letter-spacing:2px; backdrop-filter:blur(6px); display:flex; align-items:center; gap:6px; margin-bottom:4px; }
+.avatar-ring { position:relative; width:74px; height:74px; }
+.avatar-ring::before { content:''; position:absolute; inset:-3px; border-radius:50%; background:conic-gradient(var(--cyan),var(--blue2),var(--blue),var(--cyan)); animation:spin 3s linear infinite; z-index:0; }
+@keyframes spin { to{transform:rotate(360deg)} }
+.avatar-ring img { position:relative; z-index:1; width:100%; height:100%; border-radius:50%; object-fit:cover; border:3px solid var(--bg); }
+.avatar-ring::after { content:''; position:absolute; bottom:3px; right:3px; width:12px; height:12px; background:var(--green); border-radius:50%; border:2px solid var(--bg); z-index:2; box-shadow:0 0 8px var(--green); }
+.hero-username { font-family:'Orbitron',monospace; font-size:19px; font-weight:900; color:#fff; text-shadow:0 0 20px rgba(0,170,255,0.7); letter-spacing:1px; }
+.hero-badges { display:flex; align-items:center; gap:8px; }
+.badge-role { font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--text); background:rgba(0,0,0,0.5); border:1px solid var(--border2); border-radius:6px; padding:3px 10px; }
+.badge-exp { font-family:'Share Tech Mono',monospace; font-size:10px; color:#fff; background:linear-gradient(90deg,var(--blue2),var(--cyan)); border-radius:6px; padding:3px 10px; font-weight:700; }
+.hero-dots { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); display:flex; gap:5px; z-index:5; }
+.h-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,0.25); }
+.h-dot.active { background:var(--cyan); box-shadow:0 0 6px var(--cyan); }
+.bug-card { margin:14px 14px 0; background:linear-gradient(135deg,#0a1830,#0d2040 50%,#102248); border:1px solid var(--border2); border-radius:14px; padding:16px 18px; display:flex; align-items:center; gap:14px; position:relative; overflow:hidden; }
+.bug-card::before { content:''; position:absolute; inset:-1px; border-radius:15px; background:linear-gradient(90deg,var(--blue2),var(--cyan),var(--blue2)); background-size:200% 100%; z-index:-1; animation:borderMove 3s linear infinite; opacity:0.5; }
+@keyframes borderMove { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
+.bug-icon-wrap { width:52px; height:52px; background:linear-gradient(135deg,#075e54,#128c7e); border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 4px 16px rgba(18,140,126,0.4); }
+.bug-title { font-family:'Orbitron',monospace; font-size:16px; font-weight:700; color:#fff; letter-spacing:1px; margin-bottom:4px; }
+.bug-status { font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--muted); }
+.bug-status .active-txt { color:var(--green); text-shadow:0 0 8px var(--green); }
+.bug-dots { margin-left:auto; color:var(--muted); cursor:pointer; }
+.form-section { margin:14px 14px 0; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px 18px; position:relative; }
+.corner-dot { position:absolute; width:4px; height:4px; border-radius:50%; background:var(--blue2); opacity:0.5; }
+.corner-dot.tl{top:8px;left:8px} .corner-dot.tr{top:8px;right:8px} .corner-dot.bl{bottom:8px;left:8px} .corner-dot.br{bottom:8px;right:8px}
+.field-label { font-family:'Orbitron',monospace; font-size:11px; font-weight:700; color:var(--cyan); letter-spacing:2px; margin-bottom:10px; text-shadow:0 0 10px rgba(0,238,255,0.4); }
+.field-wrap { position:relative; margin-bottom:20px; }
+.field-input { width:100%; background:rgba(0,10,30,0.6); border:1px solid var(--border2); border-radius:10px; padding:14px 44px 14px 16px; font-family:'Share Tech Mono',monospace; font-size:13px; color:var(--text); outline:none; transition:border-color 0.3s,box-shadow 0.3s; }
+.field-input::placeholder { color:var(--muted); }
+.field-input:focus { border-color:var(--blue2); box-shadow:0 0 0 2px rgba(0,170,255,0.15); }
+.field-corner { position:absolute; top:50%; right:14px; transform:translateY(-50%); color:var(--muted); }
+
+/* Collapsed select + expand */
+.method-select-btn {
+  width:100%; background:rgba(0,10,30,0.6); border:1px solid var(--border2);
+  border-radius:10px; padding:14px 16px; margin-bottom:0;
+  font-family:'Share Tech Mono',monospace; font-size:13px; color:var(--text);
+  cursor:pointer; display:flex; align-items:center; justify-content:space-between;
+  transition:border-color 0.3s; user-select:none;
+}
+.method-select-btn.expanded { border-radius:10px 10px 0 0; border-color:var(--blue2); }
+.method-select-btn svg { transition:transform 0.3s; color:var(--blue2); }
+.method-select-btn.expanded svg { transform:rotate(180deg); }
+.method-list-wrap {
+  display:none; border:1px solid var(--blue2); border-top:none;
+  border-radius:0 0 10px 10px; overflow:hidden; margin-bottom:20px;
+}
+.method-list-wrap.open { display:block; animation:dropIn 0.2s ease; }
+@keyframes dropIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
+.method-list-item { padding:15px 18px; font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:600; color:var(--muted); cursor:pointer; border-bottom:1px solid rgba(26,58,92,0.4); background:rgba(0,10,30,0.6); transition:background 0.15s,color 0.15s; }
+.method-list-item:last-child { border-bottom:none; }
+.method-list-item:active { background:rgba(42,126,245,0.1); }
+.method-list-item.active { color:#fff; border-left:3px solid var(--blue2); padding-left:15px; background:rgba(26,107,219,0.15); }
+.method-wrap { margin-bottom:20px; }
+
+.send-btn { width:100%; background:linear-gradient(90deg,#0055ff,#00aaff 50%,#00eeff); border:none; border-radius:12px; padding:17px; font-family:'Orbitron',monospace; font-size:15px; font-weight:700; color:#fff; letter-spacing:2px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 4px 24px rgba(0,150,255,0.5); transition:transform 0.15s,opacity 0.2s; position:relative; overflow:hidden; text-shadow:0 1px 4px rgba(0,0,0,0.3); }
+.send-btn::before { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent); transform:translateX(-100%); animation:shimmer 2.5s infinite; }
+@keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+.send-btn:active { transform:scale(0.97); opacity:0.9; }
+
+/* Bug Success Popup */
+.bug-popup-overlay {
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75);
+  z-index:2000; align-items:center; justify-content:center;
+  backdrop-filter:blur(6px);
+}
+.bug-popup-overlay.show { display:flex; animation:fadeOv 0.25s ease; }
+
+.bug-popup-box {
+  background:linear-gradient(135deg,#0a1830,#0d2040);
+  border:1px solid var(--border2); border-radius:20px;
+  padding:36px 30px; text-align:center; width:80%; max-width:300px;
+  position:relative; overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,0.6);
+  animation:popupIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popupIn { from{transform:scale(0.7);opacity:0} to{transform:scale(1);opacity:1} }
+
+.bug-popup-box::before {
+  content:''; position:absolute; inset:-1px; border-radius:21px;
+  background:linear-gradient(90deg,var(--blue2),var(--cyan),var(--blue2));
+  background-size:200% 100%; z-index:-1;
+  animation:borderMove 2s linear infinite; opacity:0.7;
+}
+
+/* Loading ring */
+.bug-loading-ring {
+  width:80px; height:80px; border-radius:50%; margin:0 auto 20px;
+  border:4px solid rgba(0,170,255,0.15);
+  border-top:4px solid var(--cyan);
+  animation:spin 0.8s linear infinite;
+  display:flex; align-items:center; justify-content:center;
+}
+
+/* Success circle */
+.bug-success-circle {
+  width:80px; height:80px; border-radius:50%; margin:0 auto 20px;
+  background:linear-gradient(135deg,#00aa44,#00e676);
+  display:none; align-items:center; justify-content:center;
+  box-shadow:0 0 30px rgba(0,230,118,0.5);
+  animation:successPop 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes successPop { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+
+.bug-checkmark {
+  stroke-dasharray:50;
+  stroke-dashoffset:50;
+  animation:drawCheck 0.5s ease 0.1s forwards;
+}
+@keyframes drawCheck { to{ stroke-dashoffset:0; } }
+
+.bug-popup-title {
+  font-family:'Orbitron',monospace; font-size:13px; font-weight:700;
+  color:var(--cyan); letter-spacing:1px; margin-bottom:8px;
+}
+.bug-popup-title.success { color:var(--green); }
+
+.bug-popup-sub {
+  font-family:'Share Tech Mono',monospace; font-size:11px;
+  color:var(--muted); line-height:1.6;
+}
+
+.bug-progress-wrap {
+  margin:16px 0 8px;
+  height:4px; background:rgba(255,255,255,0.08);
+  border-radius:2px; overflow:hidden;
+}
+.bug-progress-bar {
+  height:100%; width:0%;
+  background:linear-gradient(90deg,var(--blue),var(--cyan));
+  border-radius:2px; transition:width 0.1s linear;
+}
+
+.bug-popup-close {
+  display:none; margin-top:20px;
+  background:linear-gradient(90deg,var(--blue),var(--blue2));
+  border:none; border-radius:10px; padding:10px 28px;
+  font-family:'Orbitron',monospace; font-size:12px; font-weight:700;
+  color:#fff; cursor:pointer; letter-spacing:1px;
+}
+
+/* ── TOOLS PAGE ── */
+.misc-card { margin:14px 14px 0; background:linear-gradient(135deg,#0a1830,#0d2040 60%,#102248); border:1px solid var(--border2); border-radius:14px; padding:16px 18px; display:flex; align-items:center; gap:14px; box-shadow:0 0 20px rgba(0,100,255,0.15); position:relative; overflow:hidden; }
+.misc-card::before { content:''; position:absolute; inset:-1px; border-radius:15px; background:linear-gradient(90deg,var(--blue2),var(--cyan),var(--blue2)); background-size:200% 100%; z-index:-1; animation:borderMove 3s linear infinite; opacity:0.5; }
+.misc-icon { width:52px; height:52px; background:linear-gradient(135deg,#1a56db,#2a7ef5); border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 4px 16px rgba(26,86,219,0.5); }
+.misc-info { flex:1; }
+.misc-title { font-family:'Orbitron',monospace; font-size:17px; font-weight:700; color:#fff; }
+.misc-sub { font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--muted); margin-top:3px; }
+.misc-role-badge { font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--cyan); border:1px solid rgba(0,238,255,0.4); border-radius:20px; padding:4px 12px; white-space:nowrap; }
+.tools-grid { margin:14px 14px 0; display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.tool-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px 18px 18px; cursor:pointer; transition:border-color 0.2s,box-shadow 0.2s,transform 0.15s; position:relative; overflow:hidden; }
+.tool-card::before { content:''; position:absolute; top:-30px; right:-30px; width:80px; height:80px; background:rgba(42,126,245,0.06); border-radius:50%; }
+.tool-card:active { transform:scale(0.97); }
+.tool-card:hover { border-color:var(--blue); box-shadow:0 0 20px rgba(26,107,219,0.2); }
+.tool-icon-wrap { width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center; margin-bottom:14px; }
+.tool-icon-wrap.blue { background:linear-gradient(135deg,#1a56db,#2a7ef5); box-shadow:0 4px 14px rgba(26,86,219,0.4); }
+.tool-name { font-family:'Orbitron',monospace; font-size:14px; font-weight:700; color:#fff; margin-bottom:4px; }
+.tool-desc { font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--muted); }
+
+/* ── ANIME PAGE ── */
+.anime-header-card { margin:14px 14px 0; background:linear-gradient(135deg,#0a1830,#0d2040 60%,#102248); border:1px solid var(--border2); border-radius:14px; padding:16px 18px; display:flex; align-items:center; gap:14px; position:relative; overflow:hidden; }
+.anime-header-card::before { content:''; position:absolute; inset:-1px; border-radius:15px; background:linear-gradient(90deg,var(--blue2),var(--cyan),var(--blue2)); background-size:200% 100%; z-index:-1; animation:borderMove 3s linear infinite; opacity:0.5; }
+.anime-play-icon { width:52px; height:52px; background:linear-gradient(135deg,#1a56db,#2a7ef5); border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.anime-header-title { font-family:'Orbitron',monospace; font-size:16px; font-weight:700; color:#fff; letter-spacing:1px; }
+.anime-header-sub { font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--muted); margin-top:3px; }
+
+.anime-search-wrap { margin:12px 14px 0; display:flex; gap:10px; }
+.anime-search-input { flex:1; background:rgba(0,10,30,0.6); border:1px solid var(--border2); border-radius:10px; padding:13px 16px; font-family:'Share Tech Mono',monospace; font-size:13px; color:var(--text); outline:none; transition:border-color 0.3s; }
+.anime-search-input::placeholder { color:var(--muted); }
+.anime-search-input:focus { border-color:var(--blue2); }
+.anime-search-btn { width:48px; height:48px; background:linear-gradient(135deg,#1a56db,#2a7ef5); border:none; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; box-shadow:0 4px 14px rgba(26,86,219,0.4); }
+
+.trending-title { margin:18px 14px 12px; display:flex; align-items:center; gap:10px; }
+.trending-bar { width:4px; height:20px; background:var(--blue2); border-radius:2px; }
+.trending-fire { font-size:18px; }
+.trending-text { font-family:'Orbitron',monospace; font-size:14px; font-weight:700; color:#fff; letter-spacing:1px; }
+
+.anime-grid { margin:0 14px; display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.anime-card { background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden; cursor:pointer; transition:transform 0.15s,box-shadow 0.2s; position:relative; }
+.anime-card:active { transform:scale(0.97); }
+.anime-card:hover { box-shadow:0 0 18px rgba(26,107,219,0.3); border-color:var(--blue); }
+.anime-card-img { width:100%; aspect-ratio:2/3; object-fit:cover; display:block; }
+.anime-rating { position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.75); border-radius:6px; padding:3px 7px; display:flex; align-items:center; gap:4px; backdrop-filter:blur(4px); }
+.anime-rating svg { color:#f5a623; }
+.anime-rating span { font-family:'Share Tech Mono',monospace; font-size:11px; color:#fff; }
+.anime-info { padding:10px 10px 12px; }
+.anime-name { font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700; color:#fff; margin-bottom:3px; line-height:1.2; }
+.anime-meta { font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--muted); display:flex; justify-content:space-between; }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:420px; background:rgba(14,17,23,0.97); border-top:1px solid var(--border); display:flex; justify-content:space-around; align-items:center; padding:10px 0 18px; z-index:500; backdrop-filter:blur(10px); pointer-events:all; }
+.nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; color:var(--muted); transition:color 0.2s; }
+.nav-item.active { color:var(--blue2); }
+.nav-item.active svg { filter:drop-shadow(0 0 5px rgba(42,126,245,0.8)); }
+.nav-label { font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:0.5px; }
+
+/* Toast */
+.toast { position:fixed; top:70px; left:50%; transform:translateX(-50%) translateY(-20px); background:linear-gradient(90deg,#0a2040,#0d3060); border:1px solid var(--blue2); border-radius:10px; padding:10px 20px; font-family:'Share Tech Mono',monospace; font-size:12px; color:var(--cyan); opacity:0; transition:all 0.3s; z-index:1000; white-space:nowrap; box-shadow:0 4px 20px rgba(0,100,255,0.3); pointer-events:none; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+body::after { content:''; position:fixed; inset:0; background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.02) 2px,rgba(0,0,0,0.02) 4px); pointer-events:none; z-index:1; }
+
+/* ── SUBPAGE OVERLAY ── */
+.subpage { display:none; position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:420px; height:100%; background:var(--bg); z-index:450; overflow-y:auto; overflow-x:hidden; padding-bottom:70px; }
+.subpage.open { display:block; animation:fadeIn 0.22s ease; }
+#sub-publicchat.open { display:flex !important; flex-direction:column; overflow:hidden; }
+.subpage-topbar { display:flex; align-items:center; gap:12px; padding:14px 16px 12px; background:rgba(14,17,23,0.97); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:10; backdrop-filter:blur(10px); }
+.subpage-back { cursor:pointer; display:flex; align-items:center; color:var(--text); }
+.subpage-title { font-family:'Share Tech Mono',monospace; font-size:15px; color:#fff; letter-spacing:1.5px; }
+
+/* Tentang Apps */
+.about-hero { position:relative; height:220px; overflow:hidden; }
+.about-hero img { width:100%; height:100%; object-fit:cover; display:block; filter:brightness(0.6); }
+.about-hero-overlay { position:absolute; inset:0; background:linear-gradient(to bottom,transparent 40%,var(--bg) 100%); }
+.about-hero-title { position:absolute; bottom:20px; left:0; right:0; text-align:center; font-family:'Orbitron',monospace; font-size:26px; font-weight:900; color:#fff; letter-spacing:2px; text-shadow:0 0 30px rgba(0,170,255,0.8); display:flex; align-items:center; justify-content:center; gap:8px; }
+.about-cursor { width:3px; height:28px; background:var(--blue2); animation:blink 1s step-end infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+.about-card { margin:14px 14px 0; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px 18px; }
+.about-welcome { display:flex; align-items:center; gap:8px; font-family:'Orbitron',monospace; font-size:16px; font-weight:700; color:#fff; margin-bottom:14px; }
+.about-body { font-family:'Rajdhani',sans-serif; font-size:15px; color:var(--text); line-height:1.7; text-align:justify; margin-bottom:14px; }
+.about-body .hl { color:var(--blue2); font-weight:700; }
+.about-body em { color:var(--cyan); font-style:italic; }
+.about-meta { font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--muted); }
+.about-meta span { color:var(--blue2); font-weight:700; }
+.fitur-title { margin:20px 14px 12px; display:flex; align-items:center; gap:10px; }
+.fitur-bar { width:4px; height:20px; background:var(--blue2); border-radius:2px; }
+.fitur-text { font-family:'Orbitron',monospace; font-size:14px; font-weight:700; color:#fff; letter-spacing:1px; }
+.fitur-item { margin:0 14px 10px; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; display:flex; align-items:center; gap:14px; cursor:pointer; transition:border-color 0.2s; }
+.fitur-item:hover { border-color:var(--blue2); }
+.fitur-icon { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.fitur-icon.red { background:linear-gradient(135deg,#c0392b,#e74c3c); }
+.fitur-icon.green { background:linear-gradient(135deg,#1a7a4a,#27ae60); }
+.fitur-icon.blue { background:linear-gradient(135deg,#1a56db,#2a7ef5); }
+.fitur-icon.purple { background:linear-gradient(135deg,#6c3483,#9b59b6); }
+.fitur-name { font-family:'Rajdhani',sans-serif; font-size:15px; font-weight:700; color:#fff; flex:1; }
+.fitur-arrow { color:var(--muted); }
+
+/* My Account */
+.account-hero { position:relative; height:180px; overflow:hidden; }
+.account-hero-bg { width:100%; height:100%; object-fit:cover; filter:brightness(0.4) saturate(1.2); display:block; }
+.account-hero-overlay { position:absolute; inset:0; background:linear-gradient(to bottom,transparent 30%,var(--bg) 100%); }
+.account-avatar-wrap { position:absolute; bottom:-36px; left:50%; transform:translateX(-50%); z-index:2; }
+.account-avatar-ring { width:76px; height:76px; border-radius:50%; border:3px solid var(--blue2); box-shadow:0 0 20px rgba(0,170,255,0.5); overflow:hidden; }
+.account-avatar-ring img { width:100%; height:100%; object-fit:cover; display:block; }
+.account-username-box { margin:50px 14px 0; text-align:center; }
+.account-username-pill { display:inline-block; background:rgba(0,10,30,0.8); border:1px solid var(--blue2); border-radius:30px; padding:8px 28px; font-family:'Orbitron',monospace; font-size:17px; font-weight:700; color:#fff; letter-spacing:1px; }
+.account-section { margin:16px 14px 0; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; }
+.account-section-title { display:flex; align-items:center; gap:10px; font-family:'Orbitron',monospace; font-size:15px; font-weight:700; color:#fff; margin-bottom:16px; }
+.account-row { display:flex; align-items:center; gap:14px; padding:10px 0; border-bottom:1px solid rgba(30,45,74,0.5); }
+.account-row:last-child { border-bottom:none; }
+.account-row-icon { width:32px; height:32px; display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--blue2); }
+.account-row-label { font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--muted); margin-bottom:3px; letter-spacing:1px; }
+.account-row-val { font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:700; color:#fff; }
+.account-row-val.cyan { color:var(--cyan); }
+.account-row-end { margin-left:auto; cursor:pointer; color:var(--muted); }
+.progress-track { height:6px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden; margin-top:6px; }
+.progress-fill { height:100%; border-radius:3px; }
+.progress-fill.blue { background:linear-gradient(90deg,var(--blue),var(--blue2)); }
+.progress-fill.green { background:linear-gradient(90deg,#27ae60,#2ecc71); }
+.progress-fill.red { background:linear-gradient(90deg,#c0392b,#e74c3c); }
+.security-row { margin-bottom:14px; }
+.security-row-header { display:flex; justify-content:space-between; font-family:'Share Tech Mono',monospace; font-size:12px; color:var(--text); margin-bottom:6px; }
+.security-row-header span { color:var(--blue2); font-weight:700; }
+
+/* Database */
+.db-header { margin:14px 14px 0; background:linear-gradient(135deg,#0a1830,#0d2040 60%,#102248); border:1px solid var(--border2); border-radius:14px; padding:16px 18px; display:flex; align-items:center; gap:14px; position:relative; overflow:hidden; }
+.db-header::before { content:''; position:absolute; inset:-1px; border-radius:15px; background:linear-gradient(90deg,var(--blue2),var(--cyan),var(--blue2)); background-size:200% 100%; z-index:-1; animation:borderMove 3s linear infinite; opacity:0.5; }
+.db-icon { width:52px; height:52px; background:linear-gradient(135deg,#1a56db,#2a7ef5); border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.db-title { font-family:'Orbitron',monospace; font-size:17px; font-weight:700; color:#fff; }
+.db-sub { font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--muted); margin-top:3px; }
+.db-actions { margin:12px 14px 0; display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.db-btn { border-radius:12px; padding:18px 10px; display:flex; flex-direction:column; align-items:center; gap:10px; cursor:pointer; border:1px solid transparent; transition:opacity 0.2s,transform 0.15s; }
+.db-btn:active { transform:scale(0.97); }
+.db-btn.on { background:linear-gradient(135deg,var(--blue),var(--blue2)); border-color:var(--blue2); box-shadow:0 4px 20px rgba(42,126,245,0.4); }
+.db-btn.off { background:var(--card); border-color:var(--border); }
+.db-btn-label { font-family:'Orbitron',monospace; font-size:12px; font-weight:700; color:#fff; }
+.db-section-title { margin:18px 14px 12px; display:flex; align-items:center; gap:10px; }
+.db-section-bar { width:4px; height:20px; background:var(--blue2); border-radius:2px; }
+.db-section-text { font-family:'Orbitron',monospace; font-size:13px; font-weight:700; color:#fff; letter-spacing:1px; }
+.db-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:60px 20px; gap:14px; color:var(--muted); }
+.db-empty svg { opacity:0.3; }
+.db-empty span { font-family:'Share Tech Mono',monospace; font-size:12px; letter-spacing:1px; opacity:0.5; }
+
+/* Tool subpage extras */
+.dl-platform { background:rgba(0,10,30,0.6); border:1px solid var(--border2); border-radius:10px; padding:10px 6px; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; transition:border-color 0.2s,background 0.2s; }
+.dl-platform span { font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--muted); }
+.dl-platform.active { background:rgba(26,86,219,0.2); border-color:var(--blue2); }
+.dl-platform.active span { color:#fff; }
+
+@keyframes osintScan { 0%,100%{transform:rotate(0deg) scale(1)} 25%{transform:rotate(5deg) scale(1.05)} 75%{transform:rotate(-5deg) scale(0.95)} }
+@keyframes pulse { 0%{transform:translate(-50%,-60%) scale(1);opacity:0.5} 100%{transform:translate(-50%,-60%) scale(2);opacity:0} }
+@keyframes gearSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes energyPulse { 0%,100%{box-shadow:0 0 30px rgba(0,238,255,0.5)} 50%{box-shadow:0 0 60px rgba(0,238,255,0.9),0 0 100px rgba(0,100,255,0.4)} }
+
+/* Anime Player */
+.anime-player-wrap { position:relative; width:100%; background:#000; }
+.anime-player-wrap iframe { width:100%; aspect-ratio:16/9; display:block; border:none; }
+.fullscreen-btn { position:absolute; bottom:8px; right:8px; background:rgba(0,0,0,0.7); border:none; border-radius:6px; padding:6px 8px; cursor:pointer; color:#fff; display:flex; align-items:center; gap:4px; font-family:'Share Tech Mono',monospace; font-size:10px; backdrop-filter:blur(4px); }
+.anime-player-info { padding:16px 16px 0; }
+.anime-player-title { font-family:'Orbitron',monospace; font-size:18px; font-weight:700; color:#fff; margin-bottom:6px; }
+.anime-player-meta { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+.anime-player-year { font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--muted); }
+.anime-player-rating { display:flex; align-items:center; gap:4px; font-family:'Share Tech Mono',monospace; font-size:12px; color:var(--orange); }
+.anime-player-actions { display:flex; align-items:center; gap:12px; padding:12px 16px; border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin-bottom:16px; }
+.like-btn { display:flex; align-items:center; gap:8px; background:var(--card); border:1px solid var(--border); border-radius:20px; padding:8px 18px; cursor:pointer; font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:600; color:var(--text); transition:all 0.2s; }
+.like-btn.liked { background:rgba(232,64,64,0.15); border-color:var(--red); color:var(--red); }
+.like-btn svg { transition:transform 0.3s; }
+.like-btn.liked svg { transform:scale(1.2); }
+.share-btn { display:flex; align-items:center; gap:8px; background:var(--card); border:1px solid var(--border); border-radius:20px; padding:8px 18px; cursor:pointer; font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:600; color:var(--text); transition:all 0.2s; margin-left:auto; }
+.anime-desc-title { font-family:'Orbitron',monospace; font-size:13px; font-weight:700; color:#fff; margin:0 16px 10px; }
+.anime-desc-text { font-family:'Rajdhani',sans-serif; font-size:14px; color:var(--text); line-height:1.7; margin:0 16px 30px; }
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- ── INTRO VIDEO ── -->
+<div id="introVideo">
+  <iframe id="introIframe" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+  <button class="skip-btn" onclick="skipIntro()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+    Skip
+  </button>
+</div>
+
+<!-- ── LOGIN PAGE ── -->
+<div id="loginPage">
+  <div class="login-glow"></div>
+  <img class="login-logo" src="https://i.ibb.co.com/7xmBj60j/file-0000000069e47207ae9074389b43bbac.png" alt="Logo">
+  <div class="login-tagline">bukam sulap bukan sihir<br>ini <em>BlueStromx</em></div>
+  <div class="login-subtitle">Sign in to continue</div>
+  <div class="login-card">
+    <div class="login-field">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <input type="text" id="loginUser" placeholder="Username" autocomplete="off">
+    </div>
+    <div class="login-field">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <input type="password" id="loginPass" placeholder="Password" autocomplete="off">
+      <div class="login-eye" onclick="togglePass()">
+        <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </div>
+    </div>
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-err" id="loginErr">Username atau password salah!</div>
+  </div>
+</div>
+
+<!-- ── SIDEBAR DRAWER ── -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <img class="drawer-header-img" src="https://i.ibb.co.com/7xmBj60j/file-0000000069e47207ae9074389b43bbac.png" alt="bg">
+    <div class="drawer-header-overlay"></div>
+    <div class="drawer-header-content">
+      <div class="drawer-app-name">BlueStromx</div>
+      <div class="drawer-user-info" id="drawerUserInfo">#BlueStromx - -</div>
+    </div>
+  </div>
+  <div class="drawer-menu">
+    <div class="drawer-item" onclick="openSubpage('tentang')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Tentang Apps
+    </div>
+    <div class="drawer-item" onclick="openSubpage('myaccount')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      My Account
+    </div>
+    <div class="drawer-item owner-only" id="dbUserMenuItem" style="display:none" onclick="openSubpage('database')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+      Database User
+    </div>
+    <div class="drawer-item" onclick="doLogout()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Logout System
+    </div>
+    <div class="drawer-divider"></div>
+    <div class="drawer-credits">
+      <div class="drawer-credits-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Credits Developer
+      </div>
+      <div class="drawer-credit-line">@DANZX <span>[ Developer ]</span></div>
+      <div class="drawer-credit-line">@-17DANZZZ★ <span>[ My Chanels ]</span></div>
+      <div class="drawer-credit-line">@KeiraaKaramoy_bot <span>[ My Bot Limit ]</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="icon-btn" onclick="openDrawer()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </div>
+    <span class="topbar-title" id="pageTitle">Dashboard</span>
+  </div>
+  <div class="topbar-right">
+    <div class="icon-btn bell-dot">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+    </div>
+    <div class="profile-circle">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4a9eff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+      </svg>
+    </div>
+    <div class="icon-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAGE: HOME ══ -->
+<div class="page active" id="page-home">
+  <div class="welcome-card">
+    <div class="wc-top">
+      <div class="wc-app-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      </div>
+      <div>
+        <div class="wc-label">Welcome back</div>
+        <div class="wc-title">BlueStromx Dashboard</div>
+      </div>
+    </div>
+    <div class="wc-stats">
+      <div class="stat-box">
+        <div class="stat-label">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Online Users
+        </div>
+        <div class="stat-val" id="statOnline">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          Connections
+        </div>
+        <div class="stat-val" id="statConn">0</div>
+      </div>
+    </div>
+  </div>
+  <div class="sec-title">Latest News</div>
+  <div class="slider-wrap">
+    <div class="slider-track" id="sliderTrack">
+      <div class="slide"><img src="https://i.ibb.co.com/qMyzwfW7/Sinopsis-Anime-Blue-Lock.jpg" alt="s1"><div class="slide-overlay"></div><div class="slide-info"><div class="slide-title">BlueStromx</div><div class="slide-sub">Release Developer @DANZX</div></div></div>
+      <div class="slide"><img src="https://i.ibb.co.com/sdHcqPqK/orig-blue-lock-cover.jpg" alt="s2"><div class="slide-overlay"></div><div class="slide-info"><div class="slide-title">New Feature Update</div><div class="slide-sub">Version 2.0 Now Available</div></div></div>
+      <div class="slide"><img src="https://i.ibb.co.com/SXwpKv8Z/hq720.jpg" alt="s3"><div class="slide-overlay"></div><div class="slide-info"><div class="slide-title">Global Network Active</div><div class="slide-sub">Stable Connection Established</div></div></div>
+    </div>
+    <button class="slider-btn prev" onclick="changeSlide(-1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <button class="slider-btn next" onclick="changeSlide(1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+    <div class="slider-dots"><div class="dot active" onclick="goSlide(0)"></div><div class="dot" onclick="goSlide(1)"></div><div class="dot" onclick="goSlide(2)"></div></div>
+  </div>
+  <div class="sec-title">Account Statistics</div>
+  <div class="stats-grid">
+    <div class="acc-card"><div class="acc-icon blue"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2a7ef5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div><div class="acc-label">Username</div><div style="display:flex;align-items:center;gap:6px"><div class="acc-val blue" id="homeUsername">-</div><span id="homeOwnerBadge" style="display:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="#4A90E2"/><path d="M7 12.5l3.5 3.5 6.5-7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div></div>
+    <div class="acc-card"><div class="acc-icon" id="homeRoleIcon" style="background:rgba(245,166,35,0.18)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5a623" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="homeRoleSvg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div><div class="acc-label">Role</div><div class="acc-val" id="homeRole" style="color:var(--orange)">-</div></div></div>
+    <div class="acc-card full"><div class="acc-icon orange"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5a623" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div><div class="acc-label">Account Expires</div><div class="acc-val orange" id="homeExpired">-</div></div></div>
+  </div>
+
+  <!-- ADD SENDER BUTTON -->
+  <div style="margin:14px 14px 0">
+    <button onclick="openSubpage('addsender')" style="width:100%;background:linear-gradient(90deg,var(--blue),var(--blue2));border:none;border-radius:12px;padding:15px;font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:#fff;letter-spacing:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 20px rgba(26,107,219,0.4)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81 19.79 19.79 0 01.28 2.18 2 2 0 012.28 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.16 6.16l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+      Add Sender
+    </button>
+  </div>
+</div>
+
+<!-- ══ PAGE: WHATSAPP ══ -->
+<div class="page" id="page-whatsapp">
+  <div class="profile-hero">
+    <div class="hero-fallback"></div>
+    <div class="yt-bg"><iframe src="https://www.youtube.com/embed/VNcVr933JU8?autoplay=1&mute=1&loop=1&playlist=VNcVr933JU8&controls=0&showinfo=0&rel=0&disablekb=1&modestbranding=1" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>
+    <div class="hero-grid"></div><div class="hero-glow"></div><div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="profile-pill"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</div>
+      <div class="avatar-ring"><img src="https://i.ibb.co.com/7xmBj60j/file-0000000069e47207ae9074389b43bbac.png" alt="Avatar"></div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px">
+        <div class="hero-username" id="waUsername">-</div>
+        <span id="waOwnerBadge" style="display:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="#2a7ef5" stroke="none"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>
+      </div>
+      <div class="hero-badges"><span class="badge-role" id="waRole">ROLE : -</span><span class="badge-exp" id="waExpired">EXPIRED : -</span></div>
+    </div>
+    <div class="hero-dots"><div class="h-dot active"></div><div class="h-dot"></div><div class="h-dot"></div></div>
+  </div>
+  <div class="bug-card">
+    <div class="bug-icon-wrap"><svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></div>
+    <div><div class="bug-title">BUG WHATSAPP</div><div class="bug-status">Status: <span class="active-txt">Active</span> | Method: 4 Available</div></div>
+    <div class="bug-dots"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></div>
+  </div>
+  <div class="form-section">
+    <div class="corner-dot tl"></div><div class="corner-dot tr"></div><div class="corner-dot bl"></div><div class="corner-dot br"></div>
+    <div class="field-label">TARGET NUMBER</div>
+    <div class="field-wrap">
+      <input class="field-input" type="tel" id="targetNumber" placeholder="628xxxxxxxxxx" maxlength="20">
+      <div class="field-corner"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81 19.79 19.79 0 01.28 2.18 2 2 0 012.28 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.16 6.16l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div>
+    </div>
+    <div class="field-label">SELECT METHOD</div>
+    <div class="method-wrap">
+      <div class="method-select-btn" id="methodBtn" onclick="toggleMethod()">
+        <span id="methodText">Crash Ui System</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="method-list-wrap" id="methodList">
+        <div class="method-list-item active" onclick="pickMethod(this,'Crash Ui System')">Crash Ui System</div>
+        <div class="method-list-item" onclick="pickMethod(this,'Delay Invisible')">Delay Invisible</div>
+        <div class="method-list-item" onclick="pickMethod(this,'Forclose – Keiraa')">Forclose &ndash; Keiraa</div>
+        <div class="method-list-item" onclick="pickMethod(this,'XKill Device')">XKill Device</div>
+      </div>
+    </div>
+    <button class="send-btn" onclick="sendBug()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Send Bug
+    </button>
+  </div>
+</div>
+
+<!-- ══ PAGE: TOOLS ══ -->
+<div class="page" id="page-tools">
+  <div class="misc-card">
+    <div class="misc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
+    <div class="misc-info"><div class="misc-title">Misc Tools</div><div class="misc-sub">Advanced Security Suite</div></div>
+    <div class="misc-role-badge" id="toolsRoleBadge">-</div>
+  </div>
+  <div class="tools-grid">
+    <div class="tool-card" onclick="openSubpage('spamer')"><div class="tool-icon-wrap blue"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="tool-name">Spamer</div><div class="tool-desc">Attack Tools</div></div>
+    <div class="tool-card" onclick="openSubpage('network')"><div class="tool-icon-wrap blue"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg></div><div class="tool-name">Network</div><div class="tool-desc">WiFi &amp; Spam</div></div>
+    <div class="tool-card" onclick="openSubpage('osint')"><div class="tool-icon-wrap blue"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="tool-name">OSINT</div><div class="tool-desc">Investigation</div></div>
+    <div class="tool-card" onclick="openSubpage('downloader')"><div class="tool-icon-wrap blue"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div><div class="tool-name">Downloader</div><div class="tool-desc">Social Media</div></div>
+    <div class="tool-card" onclick="openSubpage('utils')"><div class="tool-icon-wrap blue"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div><div class="tool-name">Utils</div><div class="tool-desc">Helper Tools</div></div>
+    <div class="tool-card" onclick="openSubpage('booster')"><div class="tool-icon-wrap blue"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="tool-name">Booster</div><div class="tool-desc">Optimize</div></div>
+    <div class="tool-card" style="grid-column:1/-1" onclick="openSubpage('publicchat')">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div class="tool-icon-wrap blue" style="width:46px;height:46px;flex-shrink:0">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="14" x2="13" y2="14"/></svg>
+        </div>
+        <div>
+          <div class="tool-name">Public Chat</div>
+          <div class="tool-desc">Chat dengan semua member • Pesan tersimpan permanen</div>
+        </div>
+        <div style="margin-left:auto">
+          <div id="chatUnreadBadge" style="display:none;background:var(--red);color:#fff;font-family:'Orbitron',monospace;font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;min-width:20px;text-align:center">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAGE: ANIME ══ -->
+<div class="page" id="page-anime">
+  <div class="anime-header-card">
+    <div class="anime-play-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+    <div><div class="anime-header-title">ANIME STATION</div><div class="anime-header-sub">Streaming &amp; Database System</div></div>
+  </div>
+  <div class="anime-search-wrap">
+    <input class="anime-search-input" type="text" placeholder="Cari anime (Naruto, One Piece)...">
+    <button class="anime-search-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
+  </div>
+  <div class="trending-title">
+    <div class="trending-bar"></div>
+    <span class="trending-fire">🔥</span>
+    <span class="trending-text">TRENDING NOW</span>
+  </div>
+  <div class="anime-grid">
+    <div class="anime-card" onclick="openAnime('naruto','Naruto','2002','8.57','https://www.youtube.com/embed/ZXufdiCMmP8','Naruto Uzumaki adalah ninja muda dari Desa Konoha yang bermimpi menjadi Hokage. Dengan semangat pantang menyerah, ia berjuang melampaui batas kemampuannya untuk melindungi orang-orang yang dicintainya.')">
+      <img class="anime-card-img" src="https://i.ibb.co.com/cpnm9DS/025a71.jpg" alt="Naruto">
+      <div class="anime-rating"><svg width="11" height="11" viewBox="0 0 24 24" fill="#f5a623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span>8.57</span></div>
+      <div class="anime-info"><div class="anime-name">Naruto</div><div class="anime-meta"><span>2002</span><span>TV</span></div></div>
+    </div>
+    <div class="anime-card" onclick="openAnime('demonslayer','Demon Slayer','2019','8.62','https://www.youtube.com/embed/Yc9_8bAZOhc','Tanjiro Kamado berjuang untuk membalas dendam dan menyelamatkan adiknya Nezuko yang berubah menjadi iblis. Bergabung dengan Demon Slayer Corps, ia menghadapi iblis-iblis paling berbahaya.')">
+      <img class="anime-card-img" src="https://i.ibb.co.com/1tSL4jFt/MV5-BMWU1-OGEw-Nm-Qt-NGM3-MS00-YTYy-LThm-Ym-Mt-N2-Fj-Yz-Qz-Nz-Nm-NTE0-Xk-Ey-Xk-Fqc-Gc-V1-FMjpg-UX1000.jpg" alt="Demon Slayer">
+      <div class="anime-rating"><svg width="11" height="11" viewBox="0 0 24 24" fill="#f5a623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span>8.62</span></div>
+      <div class="anime-info"><div class="anime-name">Demon Slayer</div><div class="anime-meta"><span>2019</span><span>TV</span></div></div>
+    </div>
+    <div class="anime-card" onclick="openAnime('onepiece','One Piece','1999','9.11','https://www.youtube.com/embed/mfeO2wJQMDo','Monkey D. Luffy berlayar mengarungi lautan Grand Line untuk menemukan harta karun legendaris One Piece dan menjadi Raja Bajak Laut. Bersama nakama setia, ia menghadapi petualangan tak terbatas.')">
+      <img class="anime-card-img" src="https://i.ibb.co.com/p6JK7rpj/MV5-BMTNj-NGU4-NTUt-Ym-Vj-My00-Yj-Ri-LTkx-MWUt-Nz-Zk-MDNi-Yj-Zh-Nm-Vi-Xk-Ey-Xk-Fqc-Gc-V1.jpg" alt="One Piece">
+      <div class="anime-rating"><svg width="11" height="11" viewBox="0 0 24 24" fill="#f5a623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span>9.11</span></div>
+      <div class="anime-info"><div class="anime-name">One Piece</div><div class="anime-meta"><span>1999</span><span>TV</span></div></div>
+    </div>
+    <div class="anime-card" onclick="openAnime('opm','One Punch Man','2015','8.48','https://www.youtube.com/embed/CQGV3Vy4M8s','Saitama adalah pahlawan yang bisa mengalahkan siapapun hanya dengan satu pukulan. Meski kuat, ia justru merasa bosan karena tidak ada lawan yang sebanding. Kisah heroik penuh komedi dan aksi luar biasa.')">
+      <img class="anime-card-img" src="https://i.ibb.co.com/ccKjBDyD/MV5-BNz-Mw-OGQ5-MWIt-Nz-E3-My00-ZDYy-LTk4-Nz-At-ZWIy-YWI0-NTZh-Yz-Y0-Xk-Ey-Xk-Fqc-Gc-V1.jpg" alt="One Punch Man">
+      <div class="anime-rating"><svg width="11" height="11" viewBox="0 0 24 24" fill="#f5a623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span>8.48</span></div>
+      <div class="anime-info"><div class="anime-name">One Punch Man</div><div class="anime-meta"><span>2015</span><span>TV</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active" onclick="switchPage('home',this,'Dashboard')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span class="nav-label">Home</span>
+  </div>
+  <div class="nav-item" onclick="switchPage('whatsapp',this,'Bug WhatsApp')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <span class="nav-label">WhatsApp</span>
+  </div>
+  <div class="nav-item" onclick="switchPage('tools',this,'Misc Tools')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+    <span class="nav-label">Tools</span>
+  </div>
+  <div class="nav-item" onclick="switchPage('anime',this,'Anime Station')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+    <span class="nav-label">Anime</span>
+  </div>
+</div>
+
+<!-- ══ SUBPAGE: SPAMER ══ -->
+<div class="subpage" id="sub-spamer">
+  <div class="subpage-topbar">
+    <div class="subpage-back" onclick="closeSubpage('spamer')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <span class="subpage-title">Spamer</span>
+  </div>
+  <div class="bug-card" style="margin:14px 14px 0">
+    <div class="bug-icon-wrap" style="background:linear-gradient(135deg,#c0392b,#e74c3c)">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <div><div class="bug-title">SPAMER</div><div class="bug-status">Status: <span class="active-txt">Active</span> | Attack Tools</div></div>
+  </div>
+  <div class="form-section">
+    <div class="corner-dot tl"></div><div class="corner-dot tr"></div><div class="corner-dot bl"></div><div class="corner-dot br"></div>
+    <div class="field-label">TARGET NUMBER</div>
+    <div class="field-wrap">
+      <input class="field-input" type="tel" id="spamTarget" placeholder="628xxxxxxxxxx" maxlength="20">
+      <div class="field-corner"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81 19.79 19.79 0 01.28 2.18 2 2 0 012.28 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.16 6.16l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div>
+    </div>
+    <div class="field-label">PESAN SPAM</div>
+    <div class="field-wrap">
+      <textarea class="field-input" id="spamMsg" placeholder="Tulis pesan yang mau di-spam..." rows="4" style="resize:none;padding-top:12px;height:auto"></textarea>
+    </div>
+    <div class="field-label">SELECT METHOD</div>
+    <div class="method-wrap">
+      <div class="method-select-btn" id="spamMethodBtn" onclick="toggleSpamMethod()">
+        <span id="spamMethodText">Crash Ui System</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="method-list-wrap" id="spamMethodList">
+        <div class="method-list-item active" onclick="pickSpamMethod(this,'Crash Ui System')">Crash Ui System</div>
+        <div class="method-list-item" onclick="pickSpamMethod(this,'Delay Invisible')">Delay Invisible</div>
+        <div class="method-list-item" onclick="pickSpamMethod(this,'Forclose – Keiraa')">Forclose &ndash; Keiraa</div>
+        <div class="method-list-item" onclick="pickSpamMethod(this,'XKill Device')">XKill Device</div>
+      </div>
+    </div>
+    <button class="send-btn" style="background:linear-gradient(90deg,#c0392b,#e74c3c)" onclick="sendSpam()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Send Spam
+    </button>
+  </div>
+</div>
+
+<!-- ══ SUBPAGE: NETWORK ══ -->
+<div class="subpage" id="sub-network">
+  <div class="subpage-topbar">
+    <div class="subpage-back" onclick="closeSubpage('network')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <span class="subpage-title">Network Monitor</span>
+  </div>
+  <div style="margin:14px 14px 0;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px">
+    <div style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:#fff;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+      NETWORK STATISTICS
+    </div>
+    <canvas id="networkChart" height="180" style="width:100%;display:block"></canvas>
+  </div>
+  <div style="margin:14px 14px 0;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:30px">
+    <div style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:#fff;margin-bottom:14px;display:flex;align-items:center;gap:8px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      PIN JARINGAN SAYA
+    </div>
+    <div id="networkInfo" style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--muted)">Memuat info jaringan...</div>
+  </div>
+</div>
+
+<!-- ══ SUBPAGE: OSINT ══ -->
+<div class="subpage" id="sub-osint">
+  <div class="subpage-topbar">
+    <div class="subpage-back" onclick="closeSubpage('osint')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <span class="subpage-title">OSINT - Investigation</span>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px 30px">
+    <div id="osintAnim" style="position:relative;width:160px;height:160px">
+      <svg id="osintLens" width="160" height="160" viewBox="0 0 160 160" style="animation:osintScan 2s ease-in-out infinite">
+        <circle cx="65" cy="65" r="50" fill="none" stroke="var(--blue2)" stroke-width="4" opacity="0.8"/>
+        <circle cx="65" cy="65" r="50" fill="none" stroke="var(--cyan)" stroke-width="2" stroke-dasharray="10 5" opacity="0.5"/>
+        <line x1="103" y1="103" x2="145" y2="145" stroke="var(--blue2)" stroke-width="6" stroke-linecap="round"/>
+        <circle cx="65" cy="65" r="8" fill="var(--blue2)" opacity="0.6"/>
+        <circle cx="65" cy="65" r="30" fill="none" stroke="var(--cyan)" stroke-width="1" stroke-dasharray="4 8" opacity="0.4"/>
+      </svg>
+      <div id="osintPulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);width:100px;height:100px;border-radius:50%;background:rgba(0,170,255,0.1);animation:pulse 1.5s ease-out infinite"></div>
+    </div>
+    <div id="osintStatus" style="font-family:'Orbitron',monospace;font-size:14px;color:var(--cyan);margin-top:20px;text-align:center;letter-spacing:1px">SCANNING...</div>
+    <div id="osintProgress" style="width:200px;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;margin-top:14px;overflow:hidden">
+      <div id="osintBar" style="height:100%;background:linear-gradient(90deg,var(--blue),var(--cyan));width:0%;transition:width 0.1s;border-radius:2px"></div>
+    </div>
+    <div id="osintResult" style="display:none;margin-top:30px;text-align:center">
+      <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+      <div style="font-family:'Orbitron',monospace;font-size:16px;font-weight:700;color:var(--green);margin-top:12px;text-shadow:0 0 20px var(--green)">AMAN DARI VIRUS</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);margin-top:6px">No threats detected • System clean</div>
+    </div>
+    <button onclick="startOsint()" id="osintBtn" style="margin-top:24px;background:linear-gradient(90deg,var(--blue),var(--blue2));border:none;border-radius:12px;padding:14px 32px;font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:#fff;cursor:pointer;letter-spacing:1px">
+      MULAI INVESTIGASI
+    </button>
+  </div>
+</div>
+
+<!-- ══ SUBPAGE: DOWNLOADER ══ -->
+<div class="subpage" id="sub-downloader">
+  <div class="subpage-topbar">
+    <div class="subpage-back" onclick="closeSubpage('downloader')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <span class="subpage-title">Downloader</span>
+  </div>
+  <div style="margin:14px 14px 0;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 18px">
+    <div style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:#fff;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      VIDEO DOWNLOADER
+    </div>
+    <div class="field-label">TAUTAN VIDEO</div>
+    <div class="field-wrap">
+      <input class="field-input" type="url" id="dlUrl" placeholder="https://youtube.com/...">
+      <div class="field-corner"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
+    </div>
+    <div class="field-label" style="margin-bottom:10px">PLATFORM</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:20px">
+      <div class="dl-platform active" onclick="selectPlatform(this,'YouTube')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.97C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 00-1.95 1.97A29 29 0 001 12a29 29 0 00.46 5.58A2.78 2.78 0 003.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.45a2.78 2.78 0 001.95-1.95A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#0e1117"/></svg>
+        <span>YouTube</span>
+      </div>
+      <div class="dl-platform" onclick="selectPlatform(this,'TikTok')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.74a4.85 4.85 0 01-1.01-.05z"/></svg>
+        <span>TikTok</span>
+      </div>
+      <div class="dl-platform" onclick="selectPlatform(this,'Instagram')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        <span>Instagram</span>
+      </div>
+    </div>
+    <div id="dlProgress" style="display:none;margin-bottom:16px">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:6px" id="dlStatus">Mengunduh...</div>
+      <div style="height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden">
+        <div id="dlBar" style="height:100%;background:linear-gradient(90deg,var(--blue),var(--cyan));width:0%;transition:width 0.3s;border-radius:3px"></div>
+      </div>
+    </div>
+    <button class="send-btn" onclick="startDownload()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download Video
+    </button>
+  </div>
+</div>
+
+<!-- ══ SUBPAGE: UTILS ══ -->
+<div class="subpage" id="sub-utils">
+  <div class="subpage-topbar">
+    <div class="subpage-back" onclick="closeSubpage('utils')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <span class="subpage-title">Utils - Helper Tools</span>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px">
+    <div id="utilsAnim" style="position:relative;width:180px;height:180px;display:flex;align-items:center;justify-content:center">
+      <svg id="utilsGear1" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--blue2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:10px;animation:gearSpin 3s linear infinite">
+        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+      <svg id="utilsGear2" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:10px;top:20px;animation:gearSpin 2s linear infinite reverse">
+        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;bottom:10px;right:30px;animation:gearSpin 4s linear infinite">
+        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </div>
+    <div id="utilsStatus" style="font-family:'Orbitron',monospace;font-size:14px;color:var(--cyan);margin-top:16px;text-align:center;letter-spacing:1px">SIAP PERBAIKAN</div>
+    <div id="utilsProgressWrap" style="display:none;width:220px;margin-top:14px">
+      <div style="height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden">
+        <div id="utilsBar" style="height:100%;background:linear-gradient(90deg,var(--orange),#f39c12);width:0%;transition:width 0.2s;border-radius:3px"></div>
+      </div>
+      <div id="utilsBarText" style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);text-align:center;margin-top:6px">0%</div>
+    </div>
+    <div id="utilsDone" style="display:none;text-align:center;margin-top:14px">
+      <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <div style="font-family:'Orbitron',monospace;font-size:15px;font-weight:700;color:var(--green);margin-top:10px">SEPERTI BARU!</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);margin-top:4px">All systems repaired & optimized</div>
+    </div>
+    <button id="utilsBtn" onclick="startUtils()" style="margin-top:24px;background:linear-gradient(90deg,var(--orange),#f39c12);border:none;border-radius:12px;padding:14px 32px;font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:#fff;cursor:pointer;letter-spacing:1px">
+      MULAI PERBAIKAN
+    </button>
+  </div>
+</div>
+
+<!-- ══ SUBPAGE: PUBLIC CHAT ══ -->
+<div class="subpage" id="sub-publicchat">
+  <div class="subpage-topbar" style="flex-shrink:0">
+    <div class="subpage-back" onclick="closeChatPage()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <span class="subpage-title">Public Chat</span>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
+      <div style="width:8px;height:8px;background:var(--green);border-radius:50%;box-shadow:0 0 6px var(--green)"></div>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--green)" id="chatOnlineCount">Online</span>
+    </div>
+  </div>
+  <div id="chatMessages" style="overflow-y:auto;padding:12px 14px;padding-bottom:90px;display:flex;flex-direction:column;gap:10px">
+    <div style="text-align:center;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);padding:10px 0">— Selamat datang di Public Chat —</div>
+  </div>
+  <div style="position:fixed;bottom:70px;left:50%;transform:translateX(-50%);width:100%;max-width:420px;background:rgba(14,17,23,0.97);border-top:1px solid var(--border);padding:10px 14px;display:flex;gap:10px;align-items:flex-end;backdrop-filter:blur(10px);z-index:460">
+    <div style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:10px 16px;display:flex;align-items:center">
+      <textarea id="chatInput" placeholder="Tulis pesan..." style="flex:1;background:none;border:none;outline:none;font-family:'Rajdhani',sans-serif;font-size:14px;color:var(--text);resize:none;max-height:80px;overflow-y:auto;line-height:1.4;width:100%" rows="1" onkeydown="chatKeydown(event)" oninput="autoResize(this)"></textarea>
+    </div>
+    <button onclick="sendChatMsg()" style="width:42px;height:42px;background:linear-gradient(135deg,var(--blue),var(--blue2));border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;box-shadow:0 4px 14px rgba(26,107,219,0.5)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ══ SUBPAGE: BOOSTER ══ -->
+<div class="subpage" id="sub-booster">
+  <div class="subpage-topbar">
+    <div class="subpage-back" onclick="closeSubpage('booster')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <span class="subpage-title">Booster</span>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px">
+    <div style="position:relative;width:160px;height:160px;display:flex;align-items:center;justify-content:center">
+      <div id="boosterRing1" style="position:absolute;width:160px;height:160px;border-radius:50%;border:3px solid rgba(0,238,255,0.15)"></div>
+      <div id="boosterRing2" style="position:absolute;width:120px;height:120px;border-radius:50%;border:3px solid rgba(0,170,255,0.2)"></div>
+      <div id="boosterRing3" style="position:absolute;width:80px;height:80px;border-radius:50%;border:3px solid rgba(42,126,245,0.3)"></div>
+      <div id="boosterCore" style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#0055ff,#00eeff);display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px rgba(0,238,255,0.5);cursor:pointer;transition:transform 0.15s" onclick="startBooster()">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+      <div id="boosterParticles"></div>
+    </div>
+    <div id="boosterStatus" style="font-family:'Orbitron',monospace;font-size:15px;color:var(--cyan);margin-top:24px;text-align:center;letter-spacing:2px">TEKAN PETIR</div>
+    <div id="boosterSubStatus" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);margin-top:6px;text-align:center">untuk mulai menyerap energi</div>
+    <div id="boosterProgressWrap" style="display:none;width:220px;margin-top:20px">
+      <div style="height:8px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden">
+        <div id="boosterBar" style="height:100%;background:linear-gradient(90deg,#0055ff,#00eeff);width:0%;transition:width 0.15s;border-radius:4px"></div>
+      </div>
+      <div id="boosterPct" style="font-family:'Orbitron',monospace;font-size:12px;color:var(--cyan);text-align:center;margin-top:8px">0%</div>
+    </div>
+    <div id="boosterDone" style="display:none;text-align:center;margin-top:20px">
+      <div style="font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:var(--green);text-shadow:0 0 20px var(--green);letter-spacing:2px">SUKSES!</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);margin-top:6px">Energy absorbed • System boosted</div>
+      <button onclick="resetBooster()" style="margin-top:16px;background:rgba(0,238,255,0.1);border:1px solid var(--cyan);border-radius:10px;padding:10px 24px;font-family:'Orbitron',monospace;font-size:11px;color:var(--cyan);cursor:pointer;letter-spacing:1px">BOOST LAGI</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SUBPAGE: ANIME PLAYER ══ -->
+<div class="subpage" id="sub-animeplayer">
+  <div class="subpage-topbar">
+    <div class="subpage-back" onclick="closeAnimePlayer()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <span class="subpage-title" id="playerTopTitle">Anime</span>
+  </div>
+  <div class="anime-player-wrap" id="playerWrap">
+    <iframe id="animeIframe" src="" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+    <button class="fullscreen-btn" onclick="toggleFullscreen()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+      Perbesar
+    </button>
+  </div>
+  <div class="anime-player-info">
+    <div class="anime-player-title" id="playerTitle"></div>
+    <div class="anime-player-meta">
+      <div class="anime-player-year" id="playerYear"></div>
+      <div class="anime-player-rating">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="#f5a623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span id="playerRating"></span>
+      </div>
+    </div>
+  </div>
+  <div class="anime-player-actions">
+    <button class="like-btn" id="likeBtn" onclick="toggleLike()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      <span id="likeCount">0</span> Suka
+    </button>
+    <button class="share-btn" onclick="showToast('Link disalin!','var(--cyan)')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      Share
+    </button>
+  </div>
+  <div class="anime-desc-title">Deskripsi</div>
+  <div class="anime-desc-text" id="playerDesc"></div>
+</div>
+
+<!-- ══ SUBPAGE: ADD SENDER ══ -->
+<div class="subpage" id="sub-addsender">
+  <div class="subpage-topbar">
+    <div class="subpage-back" onclick="closeSubpage('addsender')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <span class="subpage-title">Add Sender</span>
+  </div>
+  <div style="margin:14px 14px 0;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 18px">
+    <div class="field-label" style="margin-bottom:10px">NOMOR WHATSAPP</div>
+    <div class="field-wrap"><input class="field-input" type="tel" id="senderNumber" placeholder="628xxxxxxxxxx" maxlength="20"></div>
+    <button class="send-btn" onclick="confirmWA()" style="margin-bottom:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Confirm WA</button>
+    <div id="senderCode" style="display:none;margin-top:20px;background:rgba(0,10,30,0.6);border:1px solid var(--blue2);border-radius:12px;padding:20px;text-align:center"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:10px;letter-spacing:2px">KODE KONFIRMASI</div><div style="font-family:'Orbitron',monospace;font-size:28px;font-weight:900;color:var(--cyan);letter-spacing:6px;text-shadow:0 0 20px var(--cyan)">2K26-BLU3</div></div>
+  </div>
+</div>
+
+<!-- ══ SUBPAGE: TENTANG APPS ══ -->
+<div class="subpage" id="sub-tentang">
+  <div class="subpage-topbar">
+    <div class="subpage-back" onclick="closeSubpage('tentang')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </div>
+    <span class="subpage-title">Tentang Apps</span>
+  </div>
+  <div class="about-hero">
+    <img src="https://i.ibb.co.com/d0550YDL/file-00000000167c71fa9294494e409fa965.png" alt="hero">
+    <div class="about-hero-overlay"></div>
+    <div class="about-hero-title">BlueStromx <div class="about-cursor"></div></div>
+  </div>
+  <div class="about-card">
+    <div class="about-welcome">👋 Selamat Datang!</div>
+    <div class="about-body">
+      Halo Pengguna Setia <span class="hl">BlueStromx!</span> Terima kasih telah menggunakan aplikasi dashboard versi terbaru v4.5. Sistem ini dirancang khusus untuk mempermudah manajemen bot WhatsApp, monitoring server, dan eksekusi perintah secara <em>real-time</em> dengan antarmuka yang modern dan responsif.
+    </div>
+    <div class="about-body">
+      Kami berkomitmen untuk terus menghadirkan inovasi teknologi terbaik demi kenyamanan Anda. Jangan ragu untuk menjelajahi setiap fitur yang ada!
+    </div>
+    <div class="about-meta">Build Version: <span>4.5.2 (Stable)</span></div>
+    <div class="about-meta" style="margin-top:4px">Last Updated: <span>29 Des 2025</span></div>
+  </div>
+  <div class="fitur-title">
+    <div class="fitur-bar"></div>
+    <span style="font-size:16px">⭐</span>
+    <span class="fitur-text">FITUR UTAMA</span>
+  </div>
+  <div class="fitur-item">
+    <div class="fitur-icon red"><svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13" stroke="white" stroke-width="2"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="white" stroke-width="2"/></svg></div>
+    <span class="fitur-name">WhatsApp Attack System</span>
+    <div class="fitur-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+  </div>
+  <div class="fitur-item">
+    <div class="fitur-icon green"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div>
+    <span class="fitur-name">Misc Tools Suite</span>
+    <div class="fitur-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+  </div>
+  <div class="fitur-item">
+    <div class="fitur-icon blue"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+    <span class="fitur-name">Anime Station</span>
+    <div class="fitur-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+  </div>
+  <div class="fitur-item" style="margin-bottom:30px">
+    <div class="fitur-icon purple"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div>
+    <span class="fitur-name">Database Manager</span>
+    <div class="fitur-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+  </div>
+</div>
+
+<!-- ══ SUBPAGE: MY ACCOUNT ══ -->
+<div class="subpage" id="sub-myaccount">
+  <div class="subpage-topbar">
+    <div class="subpage-back" onclick="closeSubpage('myaccount')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </div>
+    <span class="subpage-title">My Account</span>
+  </div>
+  <div class="account-hero">
+    <img class="account-hero-bg" src="https://i.ibb.co.com/d0550YDL/file-00000000167c71fa9294494e409fa965.png" alt="bg">
+    <div class="account-hero-overlay"></div>
+    <div class="account-avatar-wrap">
+      <div class="account-avatar-ring">
+        <img src="https://i.ibb.co.com/7xmBj60j/file-0000000069e47207ae9074389b43bbac.png" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%">
+      </div>
+    </div>
+  </div>
+  <div class="account-username-box">
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px">
+      <div class="account-username-pill" id="accUsername">-</div>
+      <span id="accOwnerBadge" style="display:none">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#2a7ef5" stroke="none"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </span>
+    </div>
+  </div>
+  <!-- Account System -->
+  <div class="account-section">
+    <div class="account-section-title">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+      Account System
+    </div>
+    <div class="account-row">
+      <div class="account-row-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <div><div class="account-row-label">PENGGUNA</div><div class="account-row-val" id="accUser">-</div></div>
+    </div>
+    <div class="account-row">
+      <div class="account-row-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      <div style="flex:1"><div class="account-row-label">PASSWORD</div><div class="account-row-val" id="accPass">••••••••••</div></div>
+      <div class="account-row-end" onclick="toggleAccPass()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+    </div>
+    <div class="account-row">
+      <div class="account-row-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+      <div><div class="account-row-label">ROLE</div><div class="account-row-val cyan" id="accRole">-</div></div>
+    </div>
+    <div class="account-row">
+      <div class="account-row-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+      <div><div class="account-row-label">EXPIRED AKUN</div><div class="account-row-val" id="accExpired">-</div></div>
+    </div>
+  </div>
+  <!-- Security Account -->
+  <div class="account-section" style="margin-bottom:30px">
+    <div class="account-section-title">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+      Security Account
+    </div>
+    <div class="security-row">
+      <div class="security-row-header"><span style="color:var(--text)">Database Integrity</span><span>100%</span></div>
+      <div class="progress-track"><div class="progress-fill blue" style="width:100%"></div></div>
+    </div>
+    <div class="security-row">
+      <div class="security-row-header"><span style="color:var(--text)">Protection Level</span><span>86%</span></div>
+      <div class="progress-track"><div class="progress-fill green" style="width:86%"></div></div>
+    </div>
+    <div class="security-row">
+      <div class="security-row-header"><span style="color:var(--text)">Security Alert</span><span style="color:var(--red)">2%</span></div>
+      <div class="progress-track"><div class="progress-fill red" style="width:2%"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SUBPAGE: DATABASE USER ══ -->
+<div class="subpage" id="sub-database">
+  <div class="subpage-topbar">
+    <div class="subpage-back" onclick="closeSubpage('database')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <span class="subpage-title">Database User</span>
+  </div>
+  <div class="db-header">
+    <div class="db-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div>
+    <div><div class="db-title">Data Manager</div><div class="db-sub">Manage All Users</div></div>
+  </div>
+  <div class="db-actions">
+    <div class="db-btn on" onclick="setDbTab('list',this);document.getElementById('dbListSection').style.display='block';document.getElementById('dbAddSection').style.display='none'">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      <span class="db-btn-label">List Account</span>
+    </div>
+    <div class="db-btn off" onclick="setDbTab('add',this);document.getElementById('dbListSection').style.display='none';document.getElementById('dbAddSection').style.display='block'">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+      <span class="db-btn-label">Add Account</span>
+    </div>
+  </div>
+  <!-- LIST -->
+  <div id="dbListSection">
+    <div class="db-section-title">
+      <div class="db-section-bar"></div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span class="db-section-text">REGISTERED USERS</span>
+    </div>
+    <div style="margin:0 14px 10px;display:flex;gap:8px">
+      <button onclick="deleteExpired()" style="flex:1;background:rgba(232,64,64,0.15);border:1px solid rgba(232,64,64,0.4);border-radius:10px;padding:10px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--red);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        Hapus Expired
+      </button>
+      <button onclick="loadUsers()" style="flex:1;background:rgba(42,126,245,0.15);border:1px solid rgba(42,126,245,0.4);border-radius:10px;padding:10px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--blue2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        Refresh
+      </button>
+    </div>
+    <div id="userList" style="margin:0 14px;padding-bottom:20px"></div>
+  </div>
+  <!-- ADD -->
+  <div id="dbAddSection" style="display:none;margin:0 14px;padding-bottom:30px">
+    <div class="db-section-title" style="margin:14px 0 12px">
+      <div class="db-section-bar"></div>
+      <span class="db-section-text">TAMBAH AKUN BARU</span>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px">
+      <div class="field-label" style="margin-bottom:8px">USERNAME</div>
+      <div class="field-wrap"><input class="field-input" type="text" id="newUsername" placeholder="Masukkan username..."></div>
+      <div class="field-label" style="margin-bottom:8px">PASSWORD</div>
+      <div class="field-wrap"><input class="field-input" type="text" id="newPassword" placeholder="Masukkan password..."></div>
+      <div class="field-label" style="margin-bottom:8px">ROLE</div>
+      <div class="field-wrap" style="position:relative;margin-bottom:20px">
+        <select id="newRole" class="field-input" style="appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:44px">
+          <option value="MEMBER">MEMBER</option>
+          <option value="RESELLER">RESELLER</option>
+          <option value="OWNER">OWNER</option>
+        </select>
+        <div class="field-corner"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+      </div>
+      <div class="field-label" style="margin-bottom:8px">EXPIRED DATE</div>
+      <div class="field-wrap"><input class="field-input" type="date" id="newExpired" style="color-scheme:dark"></div>
+      <button class="send-btn" onclick="addNewUser()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+        Tambah Akun
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+// JSONBIN CONFIG — isi setelah daftar di jsonbin.io
+// ══════════════════════════════════════════════════
+const JSONBIN_API_KEY = '$2a$10$vNktQYIRUCQUixSpYEy8pei6LGay/QjfJMmbvtgSI8FI0350CBkq.';
+const JSONBIN_BIN_ID  = '6a007c6ec0954111d801f34e';
+const JSONBIN_URL     = 'https://api.jsonbin.io/v3/b/' + JSONBIN_BIN_ID;
+
+// ── STATE ──
+let accounts    = [];
+let currentUser = null;
+let authToken   = null;
+
+// ── TOKEN (sessionStorage, bukan localStorage) ──
+function saveSession(user) { sessionStorage.setItem('bsx_user', JSON.stringify(user)); }
+function getSession()      { try { return JSON.parse(sessionStorage.getItem('bsx_user')); } catch(e){ return null; } }
+function clearSession()    { sessionStorage.removeItem('bsx_user'); }
+
+// ── BACA DATABASE DARI JSONBIN ──
+async function fetchDB() {
+  const res = await fetch(JSONBIN_URL + '/latest', {
+    headers: { 'X-Master-Key': JSONBIN_API_KEY }
+  });
+  const data = await res.json();
+  return data.record || { accounts: [] };
+}
+
+// ── TULIS DATABASE KE JSONBIN ──
+async function saveDB(db) {
+  await fetch(JSONBIN_URL, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Master-Key': JSONBIN_API_KEY
+    },
+    body: JSON.stringify(db)
+  });
+}
+
+// ── LOGIN ──
+async function doLogin() {
+  const u   = document.getElementById('loginUser').value.trim();
+  const p   = document.getElementById('loginPass').value.trim();
+  const btn = document.querySelector('.login-btn');
+  const err = document.getElementById('loginErr');
+  err.style.display = 'none';
+
+  if (!u || !p) {
+    err.textContent = 'Masukkan username dan password!';
+    err.style.display = 'block'; return;
+  }
+
+  btn.textContent = 'CONNECTING...'; btn.disabled = true;
+
+  try {
+    const db  = await fetchDB();
+    const acc = (db.accounts || []).find(a =>
+      a.username.toLowerCase() === u.toLowerCase() && a.password === p
+    );
+
+    if (!acc) {
+      err.textContent = 'Username atau password salah!';
+      err.style.display = 'block';
+      btn.textContent = 'SIGN IN'; btn.disabled = false; return;
+    }
+
+    if (new Date(acc.expired) < new Date()) {
+      err.textContent = 'Akun kamu sudah expired!';
+      err.style.display = 'block';
+      btn.textContent = 'SIGN IN'; btn.disabled = false; return;
+    }
+
+    currentUser = acc;
+    saveSession(acc);
+    btn.textContent = 'SIGN IN'; btn.disabled = false;
+
+    document.getElementById('loginPage').classList.add('hide');
+    const iv = document.getElementById('introVideo');
+    iv.classList.add('show');
+    document.getElementById('introIframe').src = 'https://www.youtube.com/embed/KB9fxqW8TLs?autoplay=1&controls=1&rel=0';
+
+  } catch(e) {
+    err.textContent = 'Gagal terhubung! Cek API Key & Bin ID.';
+    err.style.display = 'block';
+    btn.textContent = 'SIGN IN'; btn.disabled = false;
+  }
+}
+
+function skipIntro() {
+  document.getElementById('introVideo').classList.remove('show');
+  document.getElementById('introIframe').src = '';
+  enterApp();
+}
+
+function enterApp() {
+  document.getElementById('introVideo').classList.remove('show');
+  document.getElementById('introIframe').src = '';
+  updateUserUI();
+  startSessionPing();
+}
+
+function togglePass() {
+  const inp = document.getElementById('loginPass');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function updateUserUI() {
+  if (!currentUser) return;
+  const u = currentUser;
+  const isOwner = u.role === 'OWNER';
+
+  // Drawer
+  const dui = document.getElementById('drawerUserInfo');
+  if (dui) dui.textContent = '#BlueStromx ' + u.username + ' - ' + u.role;
+
+  // Home stats
+  const hUsr = document.getElementById('homeUsername');
+  if (hUsr) hUsr.textContent = u.username;
+  const hRole = document.getElementById('homeRole');
+  if (hRole) {
+    hRole.textContent = u.role;
+    hRole.style.color = isOwner ? 'var(--orange)' : u.role==='RESELLER' ? 'var(--blue2)' : 'var(--green)';
+  }
+  const hExp = document.getElementById('homeExpired');
+  if (hExp) hExp.textContent = u.expired;
+  const hBadge = document.getElementById('homeOwnerBadge');
+  if (hBadge) {
+    hBadge.style.display = (u.verified || u.crown) ? 'inline-flex' : 'none';
+    hBadge.innerHTML = (u.verified ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="#4A90E2"/><path d="M7 12.5l3.5 3.5 6.5-7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>` : '') +
+      (u.crown ? `<svg width="17" height="17" viewBox="0 0 100 82" fill="#f5a623" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="63" width="90" height="14" rx="4"/><polygon points="50,5 66,40 82,20 89,57 11,57 18,20 34,40"/><circle cx="50" cy="5" r="7.5"/><circle cx="13" cy="21" r="6.5"/><circle cx="87" cy="21" r="6.5"/></svg>` : '');
+  }
+
+  // WA page
+  const waU = document.getElementById('waUsername');
+  if (waU) waU.textContent = u.username;
+  const waR = document.getElementById('waRole');
+  if (waR) waR.textContent = 'ROLE : ' + u.role;
+  const waE = document.getElementById('waExpired');
+  if (waE) waE.textContent = 'EXPIRED : ' + u.expired;
+  const waB = document.getElementById('waOwnerBadge');
+  if (waB) {
+    const show = u.verified || u.crown;
+    waB.style.display = show ? 'inline-flex' : 'none';
+    waB.innerHTML = (u.verified ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="#4A90E2"/><path d="M7 12.5l3.5 3.5 6.5-7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>` : '') + (u.crown ? `<svg width="18" height="18" viewBox="0 0 100 82" fill="#f5a623" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="63" width="90" height="14" rx="4"/><polygon points="50,5 66,40 82,20 89,57 11,57 18,20 34,40"/><circle cx="50" cy="5" r="7.5"/><circle cx="13" cy="21" r="6.5"/><circle cx="87" cy="21" r="6.5"/></svg>` : '');
+  }
+
+  // Tools badge
+  const tBadge = document.getElementById('toolsRoleBadge');
+  if (tBadge) tBadge.textContent = u.role;
+
+  // My Account subpage
+  const aUsr = document.getElementById('accUsername');
+  if (aUsr) aUsr.textContent = u.username;
+  const aUser = document.getElementById('accUser');
+  if (aUser) aUser.textContent = u.username;
+  const aPass = document.getElementById('accPass');
+  if (aPass) { aPass.textContent = '••••••••••'; aPass.dataset.real = u.password; }
+  const aRole = document.getElementById('accRole');
+  if (aRole) { aRole.textContent = u.role; aRole.style.color = isOwner ? 'var(--orange)' : u.role==='RESELLER' ? 'var(--blue2)' : 'var(--green)'; }
+  const aExp = document.getElementById('accExpired');
+  if (aExp) aExp.textContent = u.expired;
+  const aBadge = document.getElementById('accOwnerBadge');
+  if (aBadge) {
+    const showA = u.verified || u.crown;
+    aBadge.style.display = showA ? 'inline-flex' : 'none';
+    aBadge.innerHTML = (u.verified ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="#4A90E2"/><path d="M7 12.5l3.5 3.5 6.5-7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>` : '') + (u.crown ? `<svg width="18" height="18" viewBox="0 0 100 82" fill="#f5a623" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="63" width="90" height="14" rx="4"/><polygon points="50,5 66,40 82,20 89,57 11,57 18,20 34,40"/><circle cx="50" cy="5" r="7.5"/><circle cx="13" cy="21" r="6.5"/><circle cx="87" cy="21" r="6.5"/></svg>` : '');
+  }
+
+  // Owner-only elements
+  document.querySelectorAll('.owner-only').forEach(el => el.style.display = isOwner ? 'block' : 'none');
+
+  renderDbUsers();
+}
+
+// ── AUTO LOGIN JIKA SESI MASIH ADA ──
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = getSession();
+  if (saved && new Date(saved.expired) >= new Date()) {
+    currentUser = saved;
+    document.getElementById('loginPage').classList.add('hide');
+    enterApp();
+  }
+});
+
+// ── LOGOUT ──
+function doLogout() {
+  clearSession();
+  currentUser = null;
+  location.reload();
+}
+
+// ── TOGGLE ACC PASSWORD ──
+let accPassShown = false;
+function toggleAccPass() {
+  const el = document.getElementById('accPass');
+  if (!el) return;
+  accPassShown = !accPassShown;
+  el.textContent = accPassShown ? (el.dataset.real || currentUser?.password || '') : '••••••••••';
+}
+
+// ── ADD SENDER ──
+function confirmWA() {
+  const num = document.getElementById('senderNumber').value.trim();
+  if (!num || !num.startsWith('62') || num.length < 10) {
+    showToast('⚠ Masukkan nomor WA yang valid!', '#ffaa00'); return;
+  }
+  document.getElementById('senderCode').style.display = 'block';
+  showToast('✓ Kode berhasil dibuat!', '#00e676');
+}
+document.getElementById('senderNumber')?.addEventListener('input', function() {
+  this.value = this.value.replace(/[^0-9]/g, '');
+});
+
+// ── DATABASE USER MANAGER ──
+function renderDbUsers() {
+  const list = document.getElementById('userList');
+  if (!list) return;
+  list.innerHTML = '';
+  accounts.forEach((acc, i) => {
+    const isExpired = new Date(acc.expired) < new Date();
+    const roleColor = acc.role==='OWNER'?'var(--orange)':acc.role==='RESELLER'?'var(--blue2)':'var(--green)';
+    const isOwner = currentUser?.role === 'OWNER';
+    const isMe = acc.username === currentUser?.username;
+    const verifiedBadge = acc.verified ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="#4A90E2"/><path d="M7 12.5l3.5 3.5 6.5-7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>` : '';
+    const crownBadge = acc.crown ? `<svg width="16" height="16" viewBox="0 0 100 82" fill="#f5a623" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="63" width="90" height="14" rx="4"/><polygon points="50,5 66,40 82,20 89,57 11,57 18,20 34,40"/><circle cx="50" cy="5" r="7.5"/><circle cx="13" cy="21" r="6.5"/><circle cx="87" cy="21" r="6.5"/></svg>` : '';
+    list.innerHTML += `
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;flex-wrap:wrap">
+              <span style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:#fff">${acc.username}</span>
+              ${verifiedBadge}${crownBadge}
+              ${isMe?`<span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--blue2);border:1px solid var(--blue2);border-radius:4px;padding:1px 5px">YOU</span>`:''}
+            </div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted)">Role: <span style="color:${roleColor}">${acc.role}</span></div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:${isExpired?'var(--red)':'var(--muted)'}">Exp: ${acc.expired}${isExpired?' ⚠ EXPIRED':''}</div>
+          </div>
+          ${isOwner ? `
+            <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+              <button onclick="toggleBadge(${i},'verified')" style="background:${acc.verified?'rgba(74,144,226,0.2)':'rgba(255,255,255,0.05)'};border:1px solid ${acc.verified?'#4A90E2':'var(--border)'};border-radius:8px;padding:5px 10px;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:10px;color:${acc.verified?'#4A90E2':'var(--muted)'}">
+                ${acc.verified?'✓ Verified':'+ Verify'}
+              </button>
+              <button onclick="toggleBadge(${i},'crown')" style="background:${acc.crown?'rgba(245,166,35,0.2)':'rgba(255,255,255,0.05)'};border:1px solid ${acc.crown?'var(--orange)':'var(--border)'};border-radius:8px;padding:5px 10px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:10px;color:${acc.crown?'var(--orange)':'var(--muted)'}">
+                ${acc.crown?'♛ Crown':'+ Crown'}
+              </button>
+              ${!isMe?`<button onclick="deleteUser(${i})" style="background:rgba(232,64,64,0.1);border:1px solid rgba(232,64,64,0.3);border-radius:8px;padding:5px 8px;cursor:pointer;color:var(--red)">🗑</button>`:''}
+            </div>
+          `:''}
+        </div>
+      </div>`;
+  });
+}
+
+async function toggleBadge(i, type) {
+  if (currentUser?.role !== 'OWNER') return;
+  try {
+    const db = await fetchDB();
+    db.accounts[i][type] = !db.accounts[i][type];
+    await saveDB(db);
+    accounts = db.accounts;
+    const label = type==='verified'?'Centang biru':'Mahkota';
+    showToast(`✓ ${label} diupdate untuk ${accounts[i].username}`, '#00e676');
+    renderDbUsers();
+  } catch(e) { showToast('⚠ Gagal update!','#ff4444'); }
+}
+
+async function deleteUser(i) {
+  if (currentUser?.role !== 'OWNER') return;
+  const acc = accounts[i];
+  if (acc.username === currentUser.username) { showToast('Tidak bisa hapus akun sendiri!','#ff4444'); return; }
+  try {
+    const db = await fetchDB();
+    db.accounts.splice(i, 1);
+    await saveDB(db);
+    accounts = db.accounts;
+    showToast('✓ Akun ' + acc.username + ' dihapus','#00e676');
+    renderDbUsers();
+  } catch(e) { showToast('⚠ Gagal hapus!','#ff4444'); }
+}
+
+async function deleteExpired() {
+  if (currentUser?.role !== 'OWNER') return;
+  try {
+    const db = await fetchDB();
+    const before = db.accounts.length;
+    db.accounts = db.accounts.filter(a => new Date(a.expired) >= new Date() || a.username === currentUser.username);
+    const removed = before - db.accounts.length;
+    await saveDB(db);
+    accounts = db.accounts;
+    showToast(`✓ ${removed} akun expired dihapus`,'#00e676');
+    renderDbUsers();
+  } catch(e) { showToast('⚠ Gagal hapus!','#ff4444'); }
+}
+
+async function addNewUser() {
+  if (currentUser?.role !== 'OWNER') return;
+  const u = document.getElementById('newUsername').value.trim();
+  const p = document.getElementById('newPassword').value.trim();
+  const r = document.getElementById('newRole').value;
+  const e = document.getElementById('newExpired').value;
+  if (!u || !p || !e) { showToast('⚠ Isi semua field!','#ffaa00'); return; }
+  try {
+    const db = await fetchDB();
+    if ((db.accounts||[]).find(a => a.username.toLowerCase()===u.toLowerCase())) {
+      showToast('⚠ Username sudah ada!','#ff4444'); return;
+    }
+    db.accounts.push({ username:u, password:p, role:r, expired:e, verified:false, crown:false });
+    await saveDB(db);
+    accounts = db.accounts;
+    document.getElementById('newUsername').value='';
+    document.getElementById('newPassword').value='';
+    document.getElementById('newExpired').value='';
+    showToast('✓ Akun ' + u + ' ditambahkan!','#00e676');
+    renderDbUsers();
+  } catch(e) { showToast('⚠ Gagal tambah akun!','#ff4444'); }
+}
+
+async function loadUsers() {
+  try {
+    const db = await fetchDB();
+    accounts = db.accounts || [];
+    renderDbUsers();
+  } catch(e) { showToast('⚠ Gagal load data','#ff4444'); }
+}
+
+// Auto skip intro after 10s
+let introTimer;
+document.getElementById('introVideo').addEventListener('transitionend', () => {
+  clearTimeout(introTimer);
+  introTimer = setTimeout(skipIntro, 10000);
+});
+
+// Enter on login
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !document.getElementById('loginPage').classList.contains('hide')) doLogin();
+});
+function openDrawer() {
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('drawer').classList.add('open');
+}
+function closeDrawer() {
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('drawer').classList.remove('open');
+}
+function closeSubpage(id) {
+  document.getElementById('sub-'+id).classList.remove('open');
+}
+function setDbTab(tab, el) {
+  document.querySelectorAll('.db-btn').forEach(b => { b.classList.remove('on'); b.classList.add('off'); });
+  el.classList.remove('off'); el.classList.add('on');
+}
+
+// ── PAGE SWITCH ──
+function switchPage(pageId, el, title) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + pageId).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('pageTitle').textContent = title;
+  window.scrollTo(0,0);
+}
+
+// ── SLIDER ──
+let current = 0;
+const total = 3;
+const track = document.getElementById('sliderTrack');
+const dots = document.querySelectorAll('.dot');
+function updateSlider() { track.style.transform=`translateX(-${current*100}%)`; dots.forEach((d,i)=>d.classList.toggle('active',i===current)); }
+function changeSlide(dir) { current=(current+dir+total)%total; updateSlider(); }
+function goSlide(idx) { current=idx; updateSlider(); }
+setInterval(()=>changeSlide(1),3500);
+let startX=0;
+track.addEventListener('touchstart',e=>startX=e.touches[0].clientX,{passive:true});
+track.addEventListener('touchend',e=>{ const d=startX-e.changedTouches[0].clientX; if(Math.abs(d)>40)changeSlide(d>0?1:-1); });
+
+// ── METHOD SELECT ──
+let selectedMethod = 'Crash Ui System';
+function toggleMethod() {
+  const btn = document.getElementById('methodBtn');
+  const list = document.getElementById('methodList');
+  btn.classList.toggle('expanded');
+  list.classList.toggle('open');
+}
+function pickMethod(el, val) {
+  selectedMethod = val;
+  document.getElementById('methodText').textContent = val;
+  document.querySelectorAll('.method-list-item').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('methodBtn').classList.remove('expanded');
+  document.getElementById('methodList').classList.remove('open');
+}
+
+// ── SEND BUG ──
+function sendBug() {
+  const num = document.getElementById('targetNumber').value.trim();
+  if (!num) { showToast('⚠ Enter target number!','#ffaa00'); return; }
+  if (!num.startsWith('62')||num.length<10) { showToast('⚠ Invalid number format!','#ff4444'); return; }
+
+  // Show popup
+  const popup = document.getElementById('bugPopup');
+  const loadingState = document.getElementById('bugLoadingState');
+  const successState = document.getElementById('bugSuccessState');
+  const progressBar = document.getElementById('bugProgressBar');
+  const progressText = document.getElementById('bugProgressText');
+  const closeBtn = document.getElementById('bugCloseBtn');
+
+  loadingState.style.display = 'block';
+  successState.style.display = 'none';
+  closeBtn.style.display = 'none';
+  progressBar.style.width = '0%';
+  popup.classList.add('show');
+
+  const steps = [
+    { pct:15, text:'Menghubungkan ke target...' },
+    { pct:35, text:'Menyiapkan payload...' },
+    { pct:55, text:'Menginjeksi bug...' },
+    { pct:75, text:'Mengirim serangan...' },
+    { pct:90, text:'Memverifikasi pengiriman...' },
+    { pct:100, text:'Selesai!' },
+  ];
+
+  let step = 0;
+  const iv = setInterval(() => {
+    if (step >= steps.length) {
+      clearInterval(iv);
+      // Show success
+      setTimeout(() => {
+        loadingState.style.display = 'none';
+        successState.style.display = 'block';
+        document.getElementById('bugSuccessTarget').textContent = 'Target: ' + num + '\nMethod: ' + (selectedMethod || 'Crash Ui System');
+        closeBtn.style.display = 'inline-block';
+      }, 300);
+      return;
+    }
+    progressBar.style.width = steps[step].pct + '%';
+    progressText.textContent = steps[step].text;
+    step++;
+  }, 450);
+}
+
+function closeBugPopup() {
+  document.getElementById('bugPopup').classList.remove('show');
+}
+
+// ── TOAST ──
+function showToast(msg, color) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.color = color||'var(--cyan)';
+  t.style.borderColor = color||'var(--blue2)';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ── SPAM METHOD ──
+let spamMethod = 'Crash Ui System';
+function toggleSpamMethod() {
+  document.getElementById('spamMethodBtn').classList.toggle('expanded');
+  document.getElementById('spamMethodList').classList.toggle('open');
+}
+function pickSpamMethod(el, val) {
+  spamMethod = val;
+  document.getElementById('spamMethodText').textContent = val;
+  document.querySelectorAll('#spamMethodList .method-list-item').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('spamMethodBtn').classList.remove('expanded');
+  document.getElementById('spamMethodList').classList.remove('open');
+}
+function sendSpam() {
+  const num = document.getElementById('spamTarget').value.trim();
+  const msg = document.getElementById('spamMsg').value.trim();
+  if (!num) { showToast('⚠ Masukkan nomor target!','#ffaa00'); return; }
+  if (!msg) { showToast('⚠ Tulis pesan spam!','#ffaa00'); return; }
+  if (!num.startsWith('62')||num.length<10) { showToast('⚠ Format nomor salah!','#ff4444'); return; }
+  showToast('✓ Spam terkirim ke '+num,'#00e676');
+}
+
+// ── NETWORK CHART ──
+function initNetworkChart() {
+  const canvas = document.getElementById('networkChart');
+  if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.parentElement.offsetWidth - 36;
+  const H = 200;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  // Generate realistic trending-up data with noise
+  let points = [];
+  let base = 30;
+  for (let i = 0; i < 60; i++) {
+    base += (Math.random() - 0.3) * 12;
+    base = Math.max(10, Math.min(95, base));
+    points.push(base);
+  }
+
+  let animFrame;
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Dark background
+    ctx.fillStyle = '#0d1420';
+    ctx.fillRect(0, 0, W, H);
+
+    // Dashed grid lines
+    ctx.setLineDash([4, 6]);
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = 1;
+    const cols = 6, rows = 4;
+    for (let i = 1; i < cols; i++) {
+      ctx.beginPath();
+      ctx.moveTo(i * W / cols, 0);
+      ctx.lineTo(i * W / cols, H);
+      ctx.stroke();
+    }
+    for (let i = 1; i < rows; i++) {
+      ctx.beginPath();
+      ctx.moveTo(0, i * H / rows);
+      ctx.lineTo(W, i * H / rows);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    // Build path
+    const pad = 16;
+    const chartH = H - pad * 2;
+    const step = W / (points.length - 1);
+    const minV = Math.min(...points);
+    const maxV = Math.max(...points);
+    const range = maxV - minV || 1;
+
+    const getY = v => pad + chartH - ((v - minV) / range) * chartH;
+
+    // White line
+    ctx.beginPath();
+    points.forEach((p, i) => {
+      const x = i * step;
+      const y = getY(p);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // Dot at end
+    const lastX = (points.length - 1) * step;
+    const lastY = getY(points[points.length - 1]);
+    ctx.beginPath();
+    ctx.arc(lastX, lastY, 5, 0, Math.PI * 2);
+    ctx.fillStyle = '#2a7ef5';
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Animate: shift & add new point
+    points.shift();
+    const last = points[points.length - 1];
+    let next = last + (Math.random() - 0.38) * 10;
+    next = Math.max(10, Math.min(95, next));
+    points.push(next);
+
+    animFrame = requestAnimationFrame(draw);
+  }
+  if (animFrame) cancelAnimationFrame(animFrame);
+  draw();
+
+  // Network info
+  const info = document.getElementById('networkInfo');
+  if (info) info.innerHTML = `
+    <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px"><span>IP Address</span><span style="color:var(--cyan)">192.168.1.${Math.floor(Math.random()*255)}</span></div>
+    <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px"><span>Download</span><span style="color:var(--green)">${(Math.random()*50+10).toFixed(1)} Mbps</span></div>
+    <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px"><span>Upload</span><span style="color:var(--blue2)">${(Math.random()*20+5).toFixed(1)} Mbps</span></div>
+    <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px"><span>Ping</span><span style="color:var(--orange)">${Math.floor(Math.random()*30+5)} ms</span></div>
+    <div style="display:flex;justify-content:space-between;padding:9px 0;font-size:13px"><span>Status</span><span style="color:var(--green)">● Connected</span></div>
+  `;
+}
+
+// ── OSINT ──
+let osintRunning = false;
+function startOsint() {
+  if(osintRunning) return;
+  osintRunning = true;
+  document.getElementById('osintResult').style.display='none';
+  document.getElementById('osintStatus').textContent='SCANNING...';
+  document.getElementById('osintStatus').style.color='var(--cyan)';
+  document.getElementById('osintBtn').disabled=true;
+  document.getElementById('osintBtn').style.opacity='0.5';
+  let pct=0;
+  const msgs=['SCANNING SYSTEM...','ANALYZING FILES...','CHECKING THREATS...','DEEP SCAN...','FINALIZING...'];
+  const iv=setInterval(()=>{
+    pct+=Math.random()*3+1;
+    if(pct>=100){pct=100;clearInterval(iv);
+      setTimeout(()=>{
+        document.getElementById('osintStatus').style.display='none';
+        document.getElementById('osintProgress').style.display='none';
+        document.getElementById('osintResult').style.display='block';
+        document.getElementById('osintBtn').disabled=false;
+        document.getElementById('osintBtn').style.opacity='1';
+        document.getElementById('osintBtn').textContent='SCAN ULANG';
+        osintRunning=false;
+      },500);
+    }
+    document.getElementById('osintBar').style.width=pct+'%';
+    document.getElementById('osintStatus').textContent=msgs[Math.floor(pct/20)]||'SCANNING...';
+  },80);
+  document.getElementById('osintProgress').style.display='block';
+}
+
+// ── DOWNLOADER ──
+let dlPlatform='YouTube';
+function selectPlatform(el,name){
+  dlPlatform=name;
+  document.querySelectorAll('.dl-platform').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+}
+function startDownload(){
+  const url=document.getElementById('dlUrl').value.trim();
+  if(!url){showToast('⚠ Masukkan tautan video!','#ffaa00');return;}
+  const prog=document.getElementById('dlProgress');
+  const bar=document.getElementById('dlBar');
+  const status=document.getElementById('dlStatus');
+  prog.style.display='block';
+  let pct=0;
+  const iv=setInterval(()=>{
+    pct+=Math.random()*5+2;
+    if(pct>=100){pct=100;clearInterval(iv);status.textContent='Download selesai!';status.style.color='var(--green)';showToast('✓ Video berhasil didownload!','#00e676');}
+    else{status.textContent=`Mengunduh dari ${dlPlatform}... ${Math.floor(pct)}%`;}
+    bar.style.width=pct+'%';
+  },150);
+}
+
+// ── UTILS ──
+let utilsRunning=false;
+function startUtils(){
+  if(utilsRunning)return;
+  utilsRunning=true;
+  document.getElementById('utilsDone').style.display='none';
+  document.getElementById('utilsStatus').textContent='MEMPERBAIKI...';
+  document.getElementById('utilsProgressWrap').style.display='block';
+  document.getElementById('utilsBtn').disabled=true;
+  document.getElementById('utilsBtn').style.opacity='0.5';
+  let pct=0;
+  const iv=setInterval(()=>{
+    pct+=Math.random()*2+1;
+    if(pct>=100){pct=100;clearInterval(iv);
+      document.getElementById('utilsStatus').textContent='SELESAI!';
+      document.getElementById('utilsDone').style.display='block';
+      document.getElementById('utilsBtn').textContent='PERBAIKI LAGI';
+      document.getElementById('utilsBtn').disabled=false;
+      document.getElementById('utilsBtn').style.opacity='1';
+      utilsRunning=false;
+    }
+    document.getElementById('utilsBar').style.width=pct+'%';
+    document.getElementById('utilsBarText').textContent=Math.floor(pct)+'%';
+  },100);
+}
+
+// ── BOOSTER ──
+let boosterRunning=false;
+function startBooster(){
+  if(boosterRunning) return;
+  boosterRunning=true;
+
+  const core=document.getElementById('boosterCore');
+  const status=document.getElementById('boosterStatus');
+  const sub=document.getElementById('boosterSubStatus');
+  const prog=document.getElementById('boosterProgressWrap');
+  const bar=document.getElementById('boosterBar');
+  const pct=document.getElementById('boosterPct');
+  const done=document.getElementById('boosterDone');
+  const rings=[document.getElementById('boosterRing1'),document.getElementById('boosterRing2'),document.getElementById('boosterRing3')];
+
+  // Reset
+  done.style.display='none';
+  prog.style.display='block';
+  status.style.color='var(--cyan)';
+  status.textContent='MENYERAP ENERGI...';
+  sub.textContent='Harap tunggu...';
+  bar.style.width='0%';
+  pct.textContent='0%';
+
+  // Animate rings
+  rings[0].style.animation='spin 3s linear infinite';
+  rings[1].style.animation='spin 2s linear infinite reverse';
+  rings[2].style.animation='spin 1.5s linear infinite';
+
+  // Pulse core
+  let pulseOn=true;
+  const pulseIv=setInterval(()=>{
+    if(!boosterRunning){clearInterval(pulseIv);return;}
+    core.style.boxShadow=pulseOn
+      ?'0 0 60px rgba(0,238,255,0.9),0 0 100px rgba(0,100,255,0.5)'
+      :'0 0 30px rgba(0,238,255,0.5)';
+    pulseOn=!pulseOn;
+  },400);
+
+  let p=0;
+  const iv=setInterval(()=>{
+    p+=Math.random()*3+1.5;
+    if(p>=100){
+      p=100;
+      clearInterval(iv);
+      clearInterval(pulseIv);
+      // Stop ring animations
+      rings.forEach(r=>r.style.animation='none');
+      core.style.boxShadow='0 0 30px rgba(0,238,255,0.5)';
+      status.textContent='SUKSES!';
+      status.style.color='var(--green)';
+      sub.textContent='';
+      done.style.display='block';
+      boosterRunning=false;
+    }
+    bar.style.width=p+'%';
+    pct.textContent=Math.floor(p)+'%';
+  }, 80);
+}
+
+// ── OPEN SUBPAGE OVERRIDE (init network chart) ──
+// ── OPEN SUBPAGE OVERRIDE ──
+function openSubpage(id) {
+  closeDrawer();
+  setTimeout(() => {
+    document.getElementById('sub-'+id).classList.add('open');
+    if (id==='network') setTimeout(initNetworkChart, 250);
+    if (id==='osint') {
+      document.getElementById('osintResult').style.display='none';
+      document.getElementById('osintProgress').style.display='none';
+      document.getElementById('osintStatus').style.display='block';
+      document.getElementById('osintStatus').textContent='SIAP INVESTIGASI';
+      document.getElementById('osintBar').style.width='0%';
+      document.getElementById('osintBtn').textContent='MULAI INVESTIGASI';
+      osintRunning=false;
+    }
+  }, 200);
+}
+
+// ── ANIME PLAYER ──
+let likeCount = {}, likeState = {};
+function openAnime(id, title, year, rating, embedUrl, desc) {
+  document.getElementById('animeIframe').src = embedUrl;
+  document.getElementById('playerTopTitle').textContent = title;
+  document.getElementById('playerTitle').textContent = title;
+  document.getElementById('playerYear').textContent = year + ' • TV';
+  document.getElementById('playerRating').textContent = rating;
+  document.getElementById('playerDesc').textContent = desc;
+  if (!likeCount[id]) likeCount[id] = Math.floor(Math.random()*900+100);
+  document.getElementById('likeCount').textContent = likeCount[id];
+  const btn = document.getElementById('likeBtn');
+  btn.classList.toggle('liked', !!likeState[id]);
+  btn.dataset.id = id;
+  document.getElementById('sub-animeplayer').classList.add('open');
+}
+function closeAnimePlayer() {
+  document.getElementById('animeIframe').src = '';
+  document.getElementById('sub-animeplayer').classList.remove('open');
+}
+function toggleLike() {
+  const btn = document.getElementById('likeBtn');
+  const id = btn.dataset.id;
+  likeState[id] = !likeState[id];
+  likeCount[id] += likeState[id] ? 1 : -1;
+  document.getElementById('likeCount').textContent = likeCount[id];
+  btn.classList.toggle('liked', likeState[id]);
+}
+function toggleFullscreen() {
+  const wrap = document.getElementById('playerWrap');
+  if (!document.fullscreenElement) { wrap.requestFullscreen && wrap.requestFullscreen(); }
+  else { document.exitFullscreen && document.exitFullscreen(); }
+}
+
+// ── PUBLIC CHAT ──
+const CHAT_KEY = 'bluestromx_public_chat';
+const MAX_MSGS = 200;
+
+function loadChat() {
+  try {
+    const saved = localStorage.getItem(CHAT_KEY);
+    return saved ? JSON.parse(saved) : [];
+  } catch(e) { return []; }
+}
+
+function saveChat(msgs) {
+  try {
+    // Keep last MAX_MSGS only
+    const trimmed = msgs.slice(-MAX_MSGS);
+    localStorage.setItem(CHAT_KEY, JSON.stringify(trimmed));
+  } catch(e) {}
+}
+
+function getRoleColor(role) {
+  if (role === 'OWNER') return 'var(--orange)';
+  if (role === 'RESELLER') return 'var(--blue2)';
+  return 'var(--green)';
+}
+
+// SVG Icons
+const SVG_VERIFIED = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="11" fill="#4A90E2"/><path d="M7 12.5l3.5 3.5 6.5-7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const SVG_CROWN = `<svg width="16" height="16" viewBox="0 0 100 82" fill="#f5a623" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="63" width="90" height="14" rx="4"/><polygon points="50,5 66,40 82,20 89,57 11,57 18,20 34,40"/><circle cx="50" cy="5" r="7.5"/><circle cx="13" cy="21" r="6.5"/><circle cx="87" cy="21" r="6.5"/></svg>`;
+
+function getAccountBadges(acc) {
+  let badges = '';
+  if (acc.verified) badges += SVG_VERIFIED;
+  if (acc.crown) badges += SVG_CROWN;
+  return badges;
+}
+
+function getRoleBadge(role, verified, crown) {
+  let badges = '';
+  if (verified) badges += `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="11" fill="#4A90E2"/><path d="M7 12.5l3.5 3.5 6.5-7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  if (crown) badges += `<svg width="15" height="15" viewBox="0 0 100 82" fill="#f5a623" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="63" width="90" height="14" rx="4"/><polygon points="50,5 66,40 82,20 89,57 11,57 18,20 34,40"/><circle cx="50" cy="5" r="7.5"/><circle cx="13" cy="21" r="6.5"/><circle cx="87" cy="21" r="6.5"/></svg>`;
+  return badges;
+}
+
+function formatTime(ts) {
+  const d = new Date(ts);
+  return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+}
+
+function formatDate(ts) {
+  const d = new Date(ts);
+  return d.toLocaleDateString('id-ID', {day:'numeric', month:'short', year:'numeric'});
+}
+
+function renderChat() {
+  const msgs = loadChat();
+  const container = document.getElementById('chatMessages');
+  if (!container) return;
+
+  container.innerHTML = '<div style="text-align:center;font-family:\'Share Tech Mono\',monospace;font-size:10px;color:var(--muted);padding:10px 0">— Selamat datang di Public Chat —</div>';
+
+  let lastDate = '';
+  msgs.forEach((msg, idx) => {
+    const dateStr = formatDate(msg.ts);
+    if (dateStr !== lastDate) {
+      lastDate = dateStr;
+      container.innerHTML += `<div style="text-align:center;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);margin:8px 0">— ${dateStr} —</div>`;
+    }
+
+    const isMe = msg.username === currentUser?.username;
+    const roleColor = getRoleColor(msg.role);
+    const badge = getRoleBadge(msg.role, msg.verified, msg.crown);
+
+    container.innerHTML += `
+      <div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'};gap:3px" id="msg-${idx}">
+        <div style="display:flex;align-items:center;gap:5px;${isMe?'flex-direction:row-reverse':''}">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;color:${roleColor}">${msg.username}</span>
+          ${badge}
+          <span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted)">${formatTime(msg.ts)}</span>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:6px;${isMe?'flex-direction:row-reverse':''}">
+          <div style="max-width:78%;background:${isMe?'linear-gradient(135deg,var(--blue),var(--blue2))':'var(--card)'};border:1px solid ${isMe?'transparent':'var(--border)'};border-radius:${isMe?'14px 4px 14px 14px':'4px 14px 14px 14px'};padding:10px 14px;font-family:'Rajdhani',sans-serif;font-size:14px;color:#fff;line-height:1.4;word-break:break-word;${isMe?'box-shadow:0 3px 12px rgba(26,107,219,0.3)':''}">
+            ${escapeHtml(msg.text)}
+          </div>
+          ${isMe ? `<button onclick="deleteMyMsg(${idx})" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:4px;opacity:0.6;flex-shrink:0" title="Hapus pesan">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+          </button>` : ''}
+        </div>
+      </div>`;
+  });
+
+  // Scroll to bottom
+  setTimeout(() => container.scrollTop = container.scrollHeight, 50);
+}
+
+function escapeHtml(text) {
+  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function sendChatMsg() {
+  if (!currentUser) return;
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const msgs = loadChat();
+  msgs.push({
+    username: currentUser.username,
+    role: currentUser.role,
+    verified: !!currentUser.verified,
+    crown: !!currentUser.crown,
+    text: text,
+    ts: Date.now()
+  });
+  saveChat(msgs);
+  input.value = '';
+  input.style.height = 'auto';
+  renderChat();
+}
+
+function chatKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendChatMsg();
+  }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 80) + 'px';
+}
+
+function closeChatPage() {
+  closeSubpage('publicchat');
+}
+
+// ── ONLINE SESSION TRACKER ──
+const SESSION_KEY = 'bluestromx_sessions';
+const SESSION_TTL = 30000; // 30 detik timeout
+
+function updateMySession() {
+  if (!currentUser) return;
+  try {
+    const sessions = JSON.parse(localStorage.getItem(SESSION_KEY) || '{}');
+    sessions[currentUser.username] = {
+      username: currentUser.username,
+      role: currentUser.role,
+      ts: Date.now()
+    };
+    localStorage.setItem(SESSION_KEY, JSON.stringify(sessions));
+  } catch(e) {}
+}
+
+function getOnlineSessions() {
+  try {
+    const sessions = JSON.parse(localStorage.getItem(SESSION_KEY) || '{}');
+    const now = Date.now();
+    const online = [];
+    for (const key in sessions) {
+      if (now - sessions[key].ts < SESSION_TTL) {
+        online.push(sessions[key]);
+      } else {
+        delete sessions[key];
+      }
+    }
+    localStorage.setItem(SESSION_KEY, JSON.stringify(sessions));
+    return online;
+  } catch(e) { return []; }
+}
+
+function removeMySession() {
+  if (!currentUser) return;
+  try {
+    const sessions = JSON.parse(localStorage.getItem(SESSION_KEY) || '{}');
+    delete sessions[currentUser.username];
+    localStorage.setItem(SESSION_KEY, JSON.stringify(sessions));
+  } catch(e) {}
+}
+
+function updateOnlineUI() {
+  const online = getOnlineSessions();
+  const count = online.length;
+  const onlineEl = document.getElementById('statOnline');
+  const connEl = document.getElementById('statConn');
+  if (onlineEl) onlineEl.textContent = count;
+  if (connEl) connEl.textContent = count;
+
+  // Update chat online count
+  const chatOnline = document.getElementById('chatOnlineCount');
+  if (chatOnline) chatOnline.textContent = count + ' Online';
+}
+
+// Ping session every 10s
+let sessionInterval;
+function startSessionPing() {
+  updateMySession();
+  updateOnlineUI();
+  sessionInterval = setInterval(() => {
+    updateMySession();
+    updateOnlineUI();
+  }, 10000);
+}
+
+// Remove session on page leave
+window.addEventListener('beforeunload', removeMySession);
+
+function deleteMyMsg(idx) {
+  const msgs = loadChat();
+  if (msgs[idx] && msgs[idx].username === currentUser?.username) {
+    msgs.splice(idx, 1);
+    saveChat(msgs);
+    renderChat();
+  }
+}
+
+function resetBooster() {
+  document.getElementById('boosterDone').style.display='none';
+  document.getElementById('boosterProgressWrap').style.display='none';
+  document.getElementById('boosterStatus').textContent='TEKAN PETIR';
+  document.getElementById('boosterStatus').style.color='var(--cyan)';
+  document.getElementById('boosterSubStatus').textContent='untuk mulai menyerap energi';
+  document.getElementById('boosterBar').style.width='0%';
+  document.getElementById('boosterPct').textContent='0%';
+  document.getElementById('boosterCore').style.boxShadow='0 0 30px rgba(0,238,255,0.5)';
+  [1,2,3].forEach(i=>{const r=document.getElementById('boosterRing'+i);if(r)r.style.animation='none';});
+}
+
+// Override openSubpage to init chat when opened
+const _origOpenSub = openSubpage;
+openSubpage = function(id) {
+  _origOpenSub(id);
+  if (id === 'publicchat') {
+    setTimeout(() => renderChat(), 210);
+  }
+};
+
+// Poll for new messages every 3s (multi-tab sync)
+setInterval(() => {
+  const sub = document.getElementById('sub-publicchat');
+  if (sub && sub.classList.contains('open')) renderChat();
+}, 3000);
+</script>
+<!-- BUG SUCCESS POPUP -->
+<div class="bug-popup-overlay" id="bugPopup">
+  <div class="bug-popup-box">
+
+    <!-- Loading State -->
+    <div id="bugLoadingState">
+      <div class="bug-loading-ring">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81 19.79 19.79 0 01.28 2.18 2 2 0 012.28 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.16 6.16l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+        </svg>
+      </div>
+      <div class="bug-popup-title">MENGIRIM BUG...</div>
+      <div class="bug-progress-wrap"><div class="bug-progress-bar" id="bugProgressBar"></div></div>
+      <div class="bug-popup-sub" id="bugProgressText">Menghubungkan ke target...</div>
+    </div>
+
+    <!-- Success State -->
+    <div id="bugSuccessState" style="display:none">
+      <div class="bug-success-circle" style="display:flex">
+        <svg width="38" height="38" viewBox="0 0 50 50" fill="none">
+          <polyline class="bug-checkmark" points="10,26 21,37 40,14" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="bug-popup-title success">BUG BERHASIL TERKIRIM</div>
+      <div class="bug-popup-sub" id="bugSuccessTarget"></div>
+      <button class="bug-popup-close" id="bugCloseBtn" onclick="closeBugPopup()">OK</button>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
